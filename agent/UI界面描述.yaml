@@ -1,0 +1,183 @@
+# 惠家通 UI 界面描述
+
+# 整体设计风格
+design:
+  theme: 温暖乡村风
+  primary_color: "#F5A623"  # 暖橙色
+  secondary_color: "#FFFFFF"  # 白色
+  background_color: "#FFF8E7"  # 米色
+  text_color: "#333333"  # 深灰色
+  button_radius: 20px
+  card_radius: 16px
+
+# 响应式配置
+responsive:
+  max_width: 480px  # 移动端优先
+  font_scale: 1.2  # 整体放大 20%，适合老年人
+
+# 界面布局
+layout:
+  header:
+    type: fixed
+    height: 80px
+    logo: 🧠
+    title: 惠家通
+    subtitle: 乡村家庭智能服务 Agent
+    current_mode_display: true
+
+  conversation:
+    type: scrollable
+    message_bubble:
+      user:
+        background: "#F5A623"
+        text_color: "#FFFFFF"
+        position: right
+        avatar: 👤
+      agent:
+        background: "#FFFFFF"
+        text_color: "#333333"
+        position: left
+        avatar: 🧠
+        border_radius: 20px 0 20px 20px
+    font_size: 20px
+    line_height: 1.6
+    spacing: 16px
+
+  input:
+    type: fixed_bottom
+    height: 100px
+    components:
+      - type: mic_button
+        size: 60px
+        icon: 🎤
+        position: left
+        action: start_speech
+        active_color: "#FF6B6B"
+      - type: text_input
+        placeholder: 输入您的问题...
+        font_size: 18px
+        position: center
+        width: 60%
+      - type: send_button
+        size: 50px
+        icon: ➤
+        position: right
+        action: send_text
+      - type: speed_switch
+        options:
+          - label: 正常
+            value: 1.0
+          - label: 慢速
+            value: 0.8
+        default: 0.8
+        position: bottom_center
+
+  status_bar:
+    type: toast
+    position: top
+    duration: 3000
+    types:
+      - success
+      - warning
+      - error
+      - info
+
+# 功能按钮
+buttons:
+  identity_select:
+    position: top_right
+    type: dropdown
+    label: 身份选择
+    options:
+      - label: 学生/家长
+        value: funding
+        icon: 📚
+      - label: 老人家
+        value: elderly
+        icon: 👴
+      - label: 随便问问
+        value: general
+        icon: ❓
+    default: general
+
+  replay:
+    position: message_bottom
+    type: icon
+    icon: 🔊
+    label: 重听
+    size: 40px
+    color: "#F5A623"
+
+  forward:
+    position: message_bottom
+    type: icon
+    icon: ↗️
+    label: 转发
+    size: 40px
+    color: "#F5A623"
+
+  faq:
+    position: bottom_right
+    type: floating
+    icon: ❓
+    label: 常见问题
+    size: 56px
+    color: "#F5A623"
+    shadow: true
+
+# 页面组件
+pages:
+  home:
+    components:
+      - header
+      - identity_select
+      - conversation
+      - input
+      - status_bar
+      - faq
+
+  faq_list:
+    title: 常见问题
+    close_button: true
+    categories:
+      - name: 资助政策
+        icon: 📚
+        count: 10
+      - name: 防诈骗
+        icon: 🛡️
+        count: 8
+      - name: 健康养生
+        icon: 🏥
+        count: 8
+      - name: 养老政策
+        icon: 👴
+        count: 10
+
+# 交互动画
+animations:
+  speech_recording:
+    type: pulse
+    color: "#FF6B6B"
+    duration: 1000ms
+
+  message_send:
+    type: slide_up
+    duration: 300ms
+    easing: ease-out
+
+  mode_switch:
+    type: fade
+    duration: 500ms
+
+  button_click:
+    type: scale
+    scale: 0.95
+    duration: 100ms
+
+# 语音反馈
+voice_feedback:
+  recording_start: "嘟——开始录音，请说话"
+  recording_end: "嘟——录音结束，正在识别..."
+  thinking: "正在思考..."
+  speaking_start: "开始播放"
+  speaking_end: "播放结束"
