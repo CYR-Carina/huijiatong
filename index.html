@@ -1035,12 +1035,80 @@
     if (t.includes('勤工助学')) {
       return '**勤工助学**是学校为家庭经济困难学生提供的校内工作岗位。\n\n- 每月约 **300-800元**\n- 岗位类型：图书馆助理、实验室助理、行政助理等\n- 不影响学习时间\n\n入学后可向学校资助中心申请。';
     }
-    if (t.includes('自测') || t.includes('能申请什么') || t.includes('年收入') || t.includes('申请什么资助')) {
+    if (t.includes('自测') || t.includes('能申请什么') || t.includes('年收入') || t.includes('申请什么资助') || t.includes('条件自测')) {
       // 如果已经包含了具体的收入和家庭信息，直接推荐
-      if (/(\d+)\s*万/.test(t) && (t.includes('孩子') || t.includes('上学') || t.includes('在读'))) {
+      if (/(\d+)\s*万/.test(t) && (t.includes('孩子') || t.includes('上学') || t.includes('在读') || t.includes('大学') || t.includes('高中') || t.includes('初中') || t.includes('小学'))) {
         const income = t.match(/(\d+)\s*万/)[1];
-        const cnt = t.includes('两个') || t.includes('2个') ? 2 : 1;
-        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子上学），为您推荐以下资助项目（按优先级排序）：**\n\n**1\ufe0f\u20e3 生源地信用助学贷款**\n' + (cnt > 1 ? '- 两个孩子都可申请，每个最高 ' : '- 最高 ') + '**20000元/年**\n- 读书期间国家全额贴息，毕业后5年宽限期\n- 申请时间：**7月15日-9月30日**（以当年官方政策为准）\n\n**2\ufe0f\u20e3 国家助学金**\n- 入学后申请，平均 **3300元/年**，按月发放\n\n**3\ufe0f\u20e3 绿色通道**\n- 没带够学费可**先入学后缴费**\n\n**4\ufe0f\u20e3 勤工助学**\n- 校内岗位，每月约 **300-800元**\n\n> 重点提醒：**7-9月**先办助学贷款，**9-10月**入学后再办助学金，时间不冲突！\n\n需要我帮您列出详细的申请材料清单吗？';
+        // 识别孩子数量：支持 五个/3个/两个孩子/一个
+        let cnt = 1;
+        const numMap = { '一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 };
+        // 匹配"X个孩子""X个小孩"
+        const cnMatch = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个(?:孩子|小孩)'));
+        const numMatch = t.match(/(\d+)个(?:孩子|小孩)/);
+        // 匹配"两个孩子""一个孩子"等简写
+        const cnSimple = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个(?:孩子|小孩)?$'));
+        if (cnMatch) cnt = numMap[cnMatch[0][0]];
+        else if (numMatch) cnt = parseInt(numMatch[1]);
+        else if (t.includes('两个孩子') || t.includes('两个小孩')) cnt = 2;
+        else if (t.includes('一个孩子') || t.includes('一个小孩') || t.includes('1个孩子')) cnt = 1;
+        // 如果以上都没匹配到，尝试数孩子总数：数"个"出现的次数
+        else {
+          const levelMatch = t.match(/\d+个/g);
+          if (levelMatch) {
+            cnt = levelMatch.reduce((sum, m) => sum + parseInt(m), 0);
+          }
+        }
+
+        // 统计各学段人数
+        let uniCnt = 0, highCnt = 0, midCnt = 0, priCnt = 0;
+        // 解析 "两个大学" "1个大学" "大学生"
+        const uniMatch1 = t.match(/(\d+)个大学/);
+        const uniMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个大学'));
+        if (uniMatch1) uniCnt = parseInt(uniMatch1[1]);
+        else if (uniMatch2) uniCnt = numMap[uniMatch2[0][0]];
+        else if (t.includes('大学生') || t.includes('上大学')) uniCnt = 1;
+        // 多个 "大学" 关键词
+        if (uniCnt === 0) {
+          const uniKeywords = (t.match(/大学/g) || []).length;
+          if (uniKeywords > 0) uniCnt = Math.max(uniKeywords, 1);
+        }
+
+        const highMatch1 = t.match(/(\d+)个高中/);
+        const highMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个高中'));
+        if (highMatch1) highCnt = parseInt(highMatch1[1]);
+        else if (highMatch2) highCnt = numMap[highMatch2[0][0]];
+        else if (t.includes('高中生')) highCnt = 1;
+
+        const midMatch1 = t.match(/(\d+)个初中/);
+        const midMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个初中'));
+        if (midMatch1) midCnt = parseInt(midMatch1[1]);
+        else if (midMatch2) midCnt = numMap[midMatch2[0][0]];
+
+        const priMatch1 = t.match(/(\d+)个小学/);
+        const priMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个小学'));
+        if (priMatch1) priCnt = parseInt(priMatch1[1]);
+        else if (priMatch2) priCnt = numMap[priMatch2[0][0]];
+
+        // 组装学段详情
+        let detail = '';
+        const levelParts = [];
+        if (uniCnt > 0) levelParts.push(uniCnt + '个大学');
+        if (highCnt > 0) levelParts.push(highCnt + '个高中');
+        if (midCnt > 0) levelParts.push(midCnt + '个初中');
+        if (priCnt > 0) levelParts.push(priCnt + '个小学');
+        if (levelParts.length > 0) detail = '（其中' + levelParts.join('、') + '）';
+
+        // 生成推荐建议
+        let loanMsg = uniCnt > 0
+          ? '上大学的' + (uniCnt > 1 ? '孩子每人' : '孩子') + '最高可申请 **20000元/年**'
+          : '上大学后可申请，最高 **20000元/年**';
+        let grantMsg = uniCnt > 0
+          ? '上大学的' + (uniCnt > 1 ? '孩子均可申请' : '孩子入学后可申请')
+          : '上大学后入学即可申请，平均 **3300元/年**';
+        let subDetail = '';
+        if (uniCnt > 0) subDetail += ' • 读书期间国家全额贴息，毕业后5年宽限期\n• 申请时间：**7月15日-9月30日**，在县教育局办理（以当年官方政策为准）';
+
+        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n**① 生源地信用助学贷款**\n' + loanMsg + '\n' + subDetail + '\n\n**② 国家助学金**\n' + grantMsg + '，平均 **3300元/年**，按月发放\n\n**③ 绿色通道**\n没带够学费可**先入学后缴费**\n\n**④ 勤工助学**\n校内岗位，每月约 **300-800元**\n\n> 📌 助学贷款和助学金可以同时申请，**7-9月**先办贷款，**9-10月**入学后再办助学金！\n\n需要我帮您列出详细的申请材料清单吗？';
       }
       return '好的，我来帮您做条件自测！\n\n请告诉我以下信息：\n**①** 家庭年收入（万元）\n**②** 家里有几个孩子在上学\n**③** 最高学历阶段（初中/高中/大学/大专）\n**④** 是否有特殊困难（残疾/重病/低保等）\n\n您可以直接告诉我，比如："年收入3万，两个孩子，一个高中一个大学"';
     }
