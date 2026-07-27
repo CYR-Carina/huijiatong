@@ -8,11 +8,23 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "PingFang SC", sans-serif;
-      background: linear-gradient(135deg, #FFF8E7 0%, #FFF0D0 100%);
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(245,166,35,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(233,196,106,0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #FFF8E7 0%, #FFF0D0 50%, #FFE8C0 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5a623' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* ===== 顶栏 ===== */
@@ -128,7 +140,15 @@
       flex-direction: column;
       background: #fff;
       box-shadow: 0 0 40px rgba(0,0,0,0.06);
+      position: relative;
+      z-index: 1;
+      border-radius: 0 0 16px 16px;
+      overflow: hidden;
     }
+
+    .container.funding-mode { border-top: 3px solid #F5A623; }
+    .container.elderly-mode { border-top: 3px solid #4A90D9; }
+    .container.general-mode { border-top: 3px solid #F5A623; }
 
     /* ===== 对话区 ===== */
     .conversation {
@@ -324,14 +344,15 @@
       padding: 14px 12px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     .quick-action:hover {
       border-color: #F5A623;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(245,166,35,0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(245,166,35,0.15);
     }
-    .quick-action:active { transform: scale(0.96); }
+    .quick-action:active { transform: scale(0.94); }
     .quick-action .qa-icon { font-size: 26px; display: block; margin-bottom: 4px; }
     .quick-action .qa-label {
       font-size: 13px;
@@ -903,7 +924,7 @@
         { icon: '💰', label: '助学贷款', desc: '额度·申请·材料', ask: '助学贷款能贷多少钱？' },
         { icon: '🎓', label: '助学金', desc: '申请条件和标准', ask: '国家助学金多少钱？' },
         { icon: '🏆', label: '奖学金', desc: '国奖·励志奖', ask: '国家奖学金多少钱？' },
-        { icon: '📋', label: '条件自测', desc: '测测能申请什么', ask: '帮我看看能申请什么资助' }
+        { icon: '💡', label: '申请流程', desc: '手把手教你办', ask: '助学贷款怎么申请？' }
       ],
       elderly: [
         { icon: '🛡️', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
@@ -953,6 +974,10 @@
     void badge.offsetWidth;
     badge.classList.add('pop');
 
+    // 容器模式颜色
+    const container = document.querySelector('.container');
+    container.className = 'container ' + mode + '-mode';
+
     // 更新快捷操作
     updateQuickActions(mode);
 
@@ -990,26 +1015,46 @@
 
   // ===== Agent API 调用 =====
   async function getAgentReply(text, mode) {
-    // 先尝试调用本地 Trae API
-    const apiUrl = '/api/chat';
+    // 尝试多个可能的 Trae API 端点
+    const apiUrls = [
+      '/api/chat',
+      '/api/trae/chat',
+      'http://localhost:8080/api/chat',
+      'http://localhost:3000/api/chat',
+      'http://127.0.0.1:8080/api/chat'
+    ];
     const payload = {
       message: text,
       mode: mode,
       user_id: 'web-user'
     };
+    for (const url of apiUrls) {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return data.reply || data.message || data.response || '好的，已收到您的问题。';
+        }
+      } catch (e) {
+        // 继续尝试下一个端点
+      }
+    }
+    // 所有 API 都不可用，使用本地 Trae CLI 接口（如果 Trae 本地运行）
     try {
-      const res = await fetch(apiUrl, {
+      const res = await fetch('/__trae/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ text: text, context: currentMode })
       });
       if (res.ok) {
         const data = await res.json();
-        return data.reply || data.message || '好的，已收到您的问题。';
+        return data.reply || data.answer || data.text || '好的。';
       }
-    } catch (e) {
-      // API 不可用时使用模拟回复
-    }
+    } catch (e) {}
     return simulateReply(text, mode);
   }
 
@@ -1035,9 +1080,9 @@
     if (t.includes('勤工助学')) {
       return '**勤工助学**是学校为家庭经济困难学生提供的校内工作岗位。\n\n- 每月约 **300-800元**\n- 岗位类型：图书馆助理、实验室助理、行政助理等\n- 不影响学习时间\n\n入学后可向学校资助中心申请。';
     }
-    if (t.includes('自测') || t.includes('能申请什么') || t.includes('年收入') || t.includes('申请什么资助') || t.includes('条件自测')) {
+    if (t.includes('自测') || t.includes('能申请什么') || t.includes('年收入') || t.includes('申请什么资助') || t.includes('条件自测') || t.includes('推荐') || t.includes('家庭情况')) {
       // 如果已经包含了具体的收入和家庭信息，直接推荐
-      if (/(\d+)\s*万/.test(t) && (t.includes('孩子') || t.includes('上学') || t.includes('在读') || t.includes('大学') || t.includes('高中') || t.includes('初中') || t.includes('小学'))) {
+      if (/(\d+)\s*万/.test(t) && (t.includes('孩子') || t.includes('上学') || t.includes('在读') || t.includes('大学') || t.includes('高中') || t.includes('初中') || t.includes('小学') || t.includes('家庭'))) {
         const income = t.match(/(\d+)\s*万/)[1];
         // 识别孩子数量：支持 五个/3个/两个孩子/一个
         let cnt = 1;
