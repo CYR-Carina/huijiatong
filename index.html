@@ -508,23 +508,31 @@
     }
     .speed-label { font-size: 12px; color: #999; }
 
-    /* ===== 暂停朗读按钮 ===== */
+    /* ===== 朗读控制按钮（固定在屏幕顶部）===== */
     .stop-speech-btn {
       display: none;
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
       align-items: center;
-      gap: 4px;
-      background: #FF4444;
+      gap: 6px;
+      background: #E8743C;
       color: #fff;
       border: none;
-      border-radius: 16px;
-      padding: 4px 14px;
-      font-size: 13px;
+      border-radius: 24px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      margin-left: 8px;
+      box-shadow: 0 4px 16px rgba(232,116,60,0.4);
+      z-index: 250;
+      max-width: 90vw;
     }
-    .stop-speech-btn:hover { background: #CC0000; }
-    .stop-speech-btn .stop-icon { font-size: 16px; }
+    .stop-speech-btn:hover { background: #C85A28; transform: translateX(-50%) scale(1.03); }
+    .stop-speech-btn:active { transform: translateX(-50%) scale(0.96); }
+    .stop-speech-btn .stop-icon { font-size: 14px; }
     .speed-options { display: flex; gap: 4px; }
     .speed-option {
       padding: 2px 12px;
@@ -843,14 +851,17 @@
       <span class="speed-label">语速</span>
       <div class="speed-options">
         <div class="speed-option" onclick="setSpeed(1.0,this)">正常</div>
-        <div class="speed-option active" onclick="setSpeed(0.8,this)">慢速</div>
+      <div class="speed-option active" onclick="setSpeed(0.8,this)">慢速</div>
       </div>
-      <button class="stop-speech-btn" id="stopBtn" onclick="stopSpeech()">
-        <span class="stop-icon">■</span> 停止朗读
-      </button>
     </div>
   </div>
 </div>
+
+<!-- 朗读控制按钮（浮动，播放时显示） -->
+<button class="stop-speech-btn" id="stopBtn" onclick="togglePauseSpeech()">
+  <span class="stop-icon" id="stopBtnIcon">⏸</span>
+  <span id="stopBtnText">暂停</span>
+</button>
 
 <!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
 <button class="api-fab" onclick="toggleAPISettings()" title="API 设置">⚙️</button>
@@ -1666,11 +1677,16 @@
 
     currentUtter = utter;
     isSpeaking = true;
+    isPaused = false;
     const stopBtn = document.getElementById('stopBtn');
-    if (stopBtn) stopBtn.style.display = 'flex';
+    if (stopBtn) {
+      stopBtn.style.display = 'flex';
+      updateStopBtnUI('playing');
+    }
 
     utter.onend = function() {
       isSpeaking = false;
+      isPaused = false;
       stopKeepAlive();
       const sb = document.getElementById('stopBtn');
       if (sb) sb.style.display = 'none';
@@ -1678,6 +1694,7 @@
     utter.onerror = function(e) {
       console.warn('语音播放错误:', e);
       isSpeaking = false;
+      isPaused = false;
       stopKeepAlive();
       const sb = document.getElementById('stopBtn');
       if (sb) sb.style.display = 'none';
@@ -1704,11 +1721,51 @@
     }, 50);
   }
 
+  // 暂停/继续/停止 三态控制
+  // isSpeaking: 是否在播放（包括暂停状态）
+  // isPaused: 是否当前处于暂停状态
+  let isPaused = false;
+
+  function togglePauseSpeech() {
+    if (!('speechSynthesis' in window)) return;
+    if (!isSpeaking) return;
+    if (isPaused) {
+      // 继续
+      try {
+        window.speechSynthesis.resume();
+        isPaused = false;
+        updateStopBtnUI('playing');
+      } catch(e) { console.warn('resume 失败:', e); }
+    } else {
+      // 暂停
+      try {
+        window.speechSynthesis.pause();
+        isPaused = true;
+        updateStopBtnUI('paused');
+      } catch(e) { console.warn('pause 失败:', e); }
+    }
+  }
+
+  function updateStopBtnUI(state) {
+    const icon = document.getElementById('stopBtnIcon');
+    const text = document.getElementById('stopBtnText');
+    if (!icon || !text) return;
+    if (state === 'playing') {
+      icon.textContent = '⏸';
+      text.textContent = '暂停';
+    } else if (state === 'paused') {
+      icon.textContent = '▶';
+      text.textContent = '继续';
+    }
+  }
+
   function stopSpeech() {
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+      try { window.speechSynthesis.cancel(); } catch(e) {}
     }
     isSpeaking = false;
+    isPaused = false;
+    stopKeepAlive();
     const stopBtn = document.getElementById('stopBtn');
     if (stopBtn) stopBtn.style.display = 'none';
   }
