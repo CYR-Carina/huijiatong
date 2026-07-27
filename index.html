@@ -886,22 +886,60 @@
 
 <!-- ===== API 配置弹窗 ===== -->
 <div class="api-modal" id="apiModal" onclick="if(event.target===this)toggleAPISettings()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+  <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <h3 style="font-size:20px;color:#333;">⚙️ API 设置</h3>
       <button onclick="toggleAPISettings()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">✕</button>
     </div>
-    <p style="font-size:14px;color:#666;margin-bottom:12px;">配置豆包大模型 API，获得更准确的回答。不配置则使用本地模拟回复。</p>
-    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">豆包 API Key</label>
+
+    <!-- 平台选择 -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">选择平台</label>
+    <div id="platformOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+      <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #F5A623;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;">
+        <div style="font-size:22px;">🔥</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">豆包</div>
+        <div style="font-size:11px;color:#888;">50万+200万/天</div>
+      </div>
+      <div onclick="selectPlatform('zhipu')" data-platform="zhipu" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
+        <div style="font-size:22px;">🧠</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">智谱AI</div>
+        <div style="font-size:11px;color:#4CAF50;">免费不限量</div>
+      </div>
+      <div onclick="selectPlatform('siliconflow')" data-platform="siliconflow" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
+        <div style="font-size:22px;">⚡</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">硅基流动</div>
+        <div style="font-size:11px;color:#888;">2000万Token</div>
+      </div>
+      <div onclick="selectPlatform('custom')" data-platform="custom" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
+        <div style="font-size:22px;">🔧</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">自定义</div>
+        <div style="font-size:11px;color:#888;">OpenAI兼容</div>
+      </div>
+    </div>
+
+    <!-- API Key -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">API Key</label>
     <input type="password" id="apiKeyInput" placeholder="输入 API Key" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;margin-bottom:12px;box-sizing:border-box;">
-    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">模型 ID（可选）</label>
-    <input type="text" id="modelInput" placeholder="doubao-3-5-32k-250428" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;margin-bottom:16px;box-sizing:border-box;">
+
+    <!-- 自定义 API URL -->
+    <div id="apiUrlGroup" style="display:none;margin-bottom:12px;">
+      <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">API 地址</label>
+      <input type="text" id="apiUrlInput" placeholder="https://api.example.com/v1/chat/completions" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;box-sizing:border-box;">
+    </div>
+
+    <!-- 模型 ID -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">模型 ID</label>
+    <input type="text" id="modelInput" placeholder="自动填充，可自定义" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;margin-bottom:16px;box-sizing:border-box;">
+
+    <!-- 平台说明 -->
+    <div id="platformTip" style="background:#FFF8E7;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#666;line-height:1.6;"></div>
+
+    <!-- 按钮 -->
     <div style="display:flex;gap:10px;">
       <button onclick="saveAPISettings()" style="flex:1;padding:12px;background:#F5A623;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">保存</button>
       <button onclick="clearAPISettings()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:16px;cursor:pointer;">清除</button>
     </div>
     <p id="apiStatus" style="font-size:13px;color:#888;margin-top:12px;text-align:center;"></p>
-    <p style="font-size:12px;color:#aaa;margin-top:8px;">获取 API Key：火山引擎控制台 → 方舟 → API Key</p>
   </div>
 </div>
 
@@ -1035,9 +1073,45 @@
     }
   }
 
-  // ===== 豆包大模型 API 配置 =====
-  const DOUBAO_API_URL = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
-  const DOUBAO_MODEL = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
+  // ===== 多平台 API 配置 =====
+  const PLATFORMS = {
+    doubao: {
+      name: '豆包（火山引擎）',
+      apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+      defaultModel: 'doubao-3-5-32k-250428',
+      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
+    },
+    zhipu: {
+      name: '智谱AI（GLM）',
+      apiUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+      defaultModel: 'glm-4-flash',
+      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
+    },
+    siliconflow: {
+      name: '硅基流动',
+      apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+      defaultModel: 'deepseek-ai/DeepSeek-V3',
+      tip: '⚡ <b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
+    },
+    custom: {
+      name: '自定义平台',
+      apiUrl: '',
+      defaultModel: '',
+      tip: '🔧 <b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
+    }
+  };
+
+  function getApiUrl() {
+    const platform = localStorage.getItem('llm_platform') || 'doubao';
+    if (platform === 'custom') {
+      return localStorage.getItem('llm_api_url') || '';
+    }
+    return PLATFORMS[platform]?.apiUrl || PLATFORMS.doubao.apiUrl;
+  }
+
+  function getModel() {
+    return localStorage.getItem('llm_model') || PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel || 'doubao-3-5-32k-250428';
+  }
 
   // ===== 知识库内容（嵌入前端，作为 system prompt 上下文） =====
   const KB_FUNDING = `【资助政策库】
@@ -1101,14 +1175,15 @@
 
   // ===== Agent API 调用 =====
   async function getAgentReply(text, mode) {
-    // 1. 优先尝试豆包大模型 API
-    const apiKey = localStorage.getItem('doubao_api_key');
+    // 1. 优先尝试大模型 API
+    const apiKey = localStorage.getItem('llm_api_key');
     if (apiKey) {
       try {
-        const reply = await callDoubaoAPI(text, mode, apiKey);
+        const reply = await callLLMAPI(text, mode, apiKey);
         return reply;
       } catch (e) {
-        console.warn('豆包API调用失败，回退到本地回复:', e);
+        console.warn('大模型API调用失败，回退到本地回复:', e);
+        showToast('API调用失败，使用本地回复');
       }
     }
 
@@ -1136,8 +1211,8 @@
     return simulateReply(text, mode);
   }
 
-  // ===== 豆包大模型 API 调用 =====
-  async function callDoubaoAPI(text, mode, apiKey) {
+  // ===== 通用大模型 API 调用（支持多平台） =====
+  async function callLLMAPI(text, mode, apiKey) {
     // 根据模式选择知识库和 system prompt
     let systemPrompt = '';
     let kbContent = '';
@@ -1186,7 +1261,7 @@
     }
 
     const payload = {
-      model: DOUBAO_MODEL,
+      model: getModel(),
       messages: [
         { role: 'system', content: systemPrompt + '\n\n【知识库】\n' + kbContent },
         { role: 'user', content: text }
@@ -1195,7 +1270,12 @@
       max_tokens: 2048
     };
 
-    const res = await fetch(DOUBAO_API_URL, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('未配置 API 地址');
+    }
+
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1564,49 +1644,113 @@
   }
 
   // ===== API 设置 =====
+  let selectedPlatform = 'doubao';
+
   function toggleAPISettings() {
     const modal = document.getElementById('apiModal');
     const isHidden = modal.style.display === 'none';
     modal.style.display = isHidden ? 'flex' : 'none';
     if (isHidden) {
-      // 加载已保存的配置
-      const savedKey = localStorage.getItem('doubao_api_key') || '';
-      const savedModel = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
+      selectedPlatform = localStorage.getItem('llm_platform') || 'doubao';
+      selectPlatform(selectedPlatform);
+      const savedKey = localStorage.getItem('llm_api_key') || '';
+      const savedModel = localStorage.getItem('llm_model') || '';
+      const savedUrl = localStorage.getItem('llm_api_url') || '';
       document.getElementById('apiKeyInput').value = savedKey;
       document.getElementById('modelInput').value = savedModel;
+      document.getElementById('apiUrlInput').value = savedUrl;
       updateAPIStatus();
+    }
+  }
+
+  function selectPlatform(platform) {
+    selectedPlatform = platform;
+    // 更新选中样式
+    document.querySelectorAll('#platformOptions > div').forEach(el => {
+      if (el.dataset.platform === platform) {
+        el.style.borderColor = '#F5A623';
+        el.style.background = '#FFF8E7';
+      } else {
+        el.style.borderColor = '#ddd';
+        el.style.background = '#fff';
+      }
+    });
+
+    // 更新模型默认值
+    const config = PLATFORMS[platform];
+    if (config) {
+      // 只在输入框为空或与之前平台默认值一致时才更新
+      const modelInput = document.getElementById('modelInput');
+      const oldDefault = PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel;
+      if (!modelInput.value || modelInput.value === oldDefault) {
+        modelInput.value = config.defaultModel;
+      }
+
+      // 显示/隐藏自定义 API URL
+      const urlGroup = document.getElementById('apiUrlGroup');
+      if (platform === 'custom') {
+        urlGroup.style.display = 'block';
+        const savedUrl = localStorage.getItem('llm_api_url') || '';
+        document.getElementById('apiUrlInput').value = savedUrl;
+      } else {
+        urlGroup.style.display = 'none';
+      }
+
+      // 更新说明
+      document.getElementById('platformTip').innerHTML = config.tip;
     }
   }
 
   function saveAPISettings() {
     const apiKey = document.getElementById('apiKeyInput').value.trim();
-    const model = document.getElementById('modelInput').value.trim() || 'doubao-3-5-32k-250428';
+    const model = document.getElementById('modelInput').value.trim();
+    const apiUrl = document.getElementById('apiUrlInput').value.trim();
+
     if (!apiKey) {
       showToast('请输入 API Key');
       return;
     }
-    localStorage.setItem('doubao_api_key', apiKey);
-    localStorage.setItem('doubao_model', model);
-    showToast('✅ API 配置已保存，现在回答将使用豆包大模型');
+    if (selectedPlatform === 'custom' && !apiUrl) {
+      showToast('请填写 API 地址');
+      return;
+    }
+
+    const config = PLATFORMS[selectedPlatform];
+    const finalModel = model || config?.defaultModel || '';
+
+    localStorage.setItem('llm_platform', selectedPlatform);
+    localStorage.setItem('llm_api_key', apiKey);
+    localStorage.setItem('llm_model', finalModel);
+    if (selectedPlatform === 'custom') {
+      localStorage.setItem('llm_api_url', apiUrl);
+    }
+
+    showToast('✅ 已配置 ' + (config?.name || '自定义') + '，现在回答更准确');
     updateAPIStatus();
     setTimeout(() => toggleAPISettings(), 1500);
   }
 
   function clearAPISettings() {
-    localStorage.removeItem('doubao_api_key');
-    localStorage.removeItem('doubao_model');
+    localStorage.removeItem('llm_platform');
+    localStorage.removeItem('llm_api_key');
+    localStorage.removeItem('llm_model');
+    localStorage.removeItem('llm_api_url');
     document.getElementById('apiKeyInput').value = '';
-    document.getElementById('modelInput').value = 'doubao-3-5-32k-250428';
+    document.getElementById('modelInput').value = '';
+    document.getElementById('apiUrlInput').value = '';
+    selectPlatform('doubao');
     showToast('已清除 API 配置，将使用本地模拟回复');
     updateAPIStatus();
   }
 
   function updateAPIStatus() {
     const statusEl = document.getElementById('apiStatus');
-    const apiKey = localStorage.getItem('doubao_api_key');
+    const apiKey = localStorage.getItem('llm_api_key');
     if (apiKey) {
-      const model = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
-      statusEl.textContent = '✅ 已配置（模型：' + model + '）';
+      const platform = localStorage.getItem('llm_platform') || 'doubao';
+      const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
+      const name = PLATFORMS[platform]?.name || platform;
+      statusEl.innerHTML = '✅ 已配置 <b>' + name + '</b>（' + model + '）';
       statusEl.style.color = '#4CAF50';
     } else {
       statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
