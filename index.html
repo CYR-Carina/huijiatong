@@ -558,6 +558,35 @@
       box-shadow: 0 6px 20px rgba(245,166,35,0.5);
     }
 
+    /* ===== API 设置悬浮按钮 ===== */
+    .api-fab {
+      position: fixed;
+      bottom: 240px;
+      right: max(calc(50vw - 260px + 16px), 16px);
+      width: 52px; height: 52px;
+      border: 2px solid #F5A623;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+      z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      animation: apiFabPulse 2.5s ease-in-out infinite;
+    }
+    .api-fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(245,166,35,0.4);
+    }
+    @keyframes apiFabPulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(245,166,35,0.3); }
+      50% { box-shadow: 0 4px 24px rgba(245,166,35,0.7); }
+    }
+    @media (max-width: 600px) {
+      .api-fab { right: 16px; bottom: 230px; width: 48px; height: 48px; font-size: 22px; }
+    }
+
     /* ===== FAQ 弹窗 ===== */
     .faq-modal {
       position: fixed;
@@ -819,7 +848,7 @@
 </div>
 
 <!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
-<button class="api-fab" onclick="toggleAPISettings()" title="API 设置" style="position:fixed;right:20px;bottom:220px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #F5A623;color:#F5A623;font-size:22px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:200;transition:all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">⚙️</button>
+<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">⚙️</button>
 <button class="faq-fab" onclick="toggleFAQ()" title="常见问题">❓</button>
 
 <!-- ===== FAQ 弹窗 ===== -->
