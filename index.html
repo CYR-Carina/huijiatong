@@ -934,6 +934,21 @@
     <!-- 平台说明 -->
     <div id="platformTip" style="background:#FFF8E7;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#666;line-height:1.6;"></div>
 
+    <!-- 备选平台配置（可选） -->
+    <div style="border-top:1px dashed #ddd;padding-top:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <label style="font-size:14px;color:#333;font-weight:600;">备选平台（可选）</label>
+        <span style="font-size:11px;color:#888;background:#f0f0f0;padding:2px 6px;border-radius:4px;">主平台失败时自动切换</span>
+      </div>
+      <select id="backupPlatformSelect" onchange="onBackupPlatformChange()" style="width:100%;padding:10px;border:2px solid #F5A623;border-radius:8px;font-size:14px;margin-bottom:8px;box-sizing:border-box;">
+        <option value="">不启用备选</option>
+        <option value="zhipu">智谱AI（GLM-4-Flash 免费）</option>
+        <option value="doubao">豆包（火山引擎）</option>
+        <option value="siliconflow">硅基流动</option>
+      </select>
+      <input type="password" id="backupApiKeyInput" placeholder="备选平台 API Key" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;box-sizing:border-box;display:none;">
+    </div>
+
     <!-- 按钮 -->
     <div style="display:flex;gap:10px;">
       <button onclick="saveAPISettings()" style="flex:1;padding:12px;background:#F5A623;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">保存</button>
@@ -1175,19 +1190,32 @@
 
   // ===== Agent API 调用 =====
   async function getAgentReply(text, mode) {
-    // 1. 优先尝试大模型 API
+    // 1. 优先尝试主平台 API
     const apiKey = localStorage.getItem('llm_api_key');
+    const platform = localStorage.getItem('llm_platform') || 'doubao';
     if (apiKey) {
       try {
-        const reply = await callLLMAPI(text, mode, apiKey);
+        const reply = await callLLMAPI(text, mode, apiKey, platform);
         return reply;
       } catch (e) {
-        console.warn('大模型API调用失败，回退到本地回复:', e);
+        console.warn('主平台API调用失败:', e.message);
+        // 2. 尝试备选平台 API
+        const backupKey = localStorage.getItem('llm_backup_key');
+        const backupPlatform = localStorage.getItem('llm_backup_platform');
+        if (backupKey && backupPlatform && backupPlatform !== platform) {
+          try {
+            showToast('主平台失败，切换到备选平台...');
+            const reply = await callLLMAPI(text, mode, backupKey, backupPlatform);
+            return reply;
+          } catch (e2) {
+            console.warn('备选平台API调用失败:', e2.message);
+          }
+        }
         showToast('API调用失败，使用本地回复');
       }
     }
 
-    // 2. 尝试本地后端 API（如果部署了后端服务）
+    // 3. 尝试本地后端 API（如果部署了后端服务）
     const apiUrls = [
       '/api/chat',
       'http://localhost:8080/api/chat',
@@ -1207,12 +1235,13 @@
       } catch (e) {}
     }
 
-    // 3. 回退到本地模拟回复
+    // 4. 回退到本地模拟回复
     return simulateReply(text, mode);
   }
 
   // ===== 通用大模型 API 调用（支持多平台） =====
-  async function callLLMAPI(text, mode, apiKey) {
+  async function callLLMAPI(text, mode, apiKey, platform) {
+    platform = platform || localStorage.getItem('llm_platform') || 'doubao';
     // 根据模式选择知识库和 system prompt
     let systemPrompt = '';
     let kbContent = '';
@@ -1260,8 +1289,28 @@
       kbContent = KB_FUNDING + '\n\n' + KB_ELDERLY;
     }
 
+    // 获取平台配置
+    const config = PLATFORMS[platform];
+    if (!config) throw new Error('未知平台: ' + platform);
+
+    // 根据平台决定模型和 API URL
+    let apiUrl, model;
+    if (platform === 'custom') {
+      apiUrl = localStorage.getItem('llm_api_url') || '';
+      model = localStorage.getItem('llm_model') || '';
+    } else {
+      apiUrl = config.apiUrl;
+      // 主平台用 llm_model，备选用默认模型
+      model = (platform === (localStorage.getItem('llm_platform') || 'doubao'))
+        ? (localStorage.getItem('llm_model') || config.defaultModel)
+        : config.defaultModel;
+    }
+
+    if (!apiUrl) throw new Error('未配置 API 地址');
+    if (!model) throw new Error('未配置模型 ID');
+
     const payload = {
-      model: getModel(),
+      model: model,
       messages: [
         { role: 'system', content: systemPrompt + '\n\n【知识库】\n' + kbContent },
         { role: 'user', content: text }
@@ -1269,11 +1318,6 @@
       temperature: 0.3,
       max_tokens: 2048
     };
-
-    const apiUrl = getApiUrl();
-    if (!apiUrl) {
-      throw new Error('未配置 API 地址');
-    }
 
     const res = await fetch(apiUrl, {
       method: 'POST',
@@ -1659,7 +1703,29 @@
       document.getElementById('apiKeyInput').value = savedKey;
       document.getElementById('modelInput').value = savedModel;
       document.getElementById('apiUrlInput').value = savedUrl;
+      // 加载备选平台配置
+      const backupPlatform = localStorage.getItem('llm_backup_platform') || '';
+      const backupKey = localStorage.getItem('llm_backup_key') || '';
+      document.getElementById('backupPlatformSelect').value = backupPlatform;
+      document.getElementById('backupApiKeyInput').value = backupKey;
+      onBackupPlatformChange();
       updateAPIStatus();
+    }
+  }
+
+  function onBackupPlatformChange() {
+    const sel = document.getElementById('backupPlatformSelect');
+    const keyInput = document.getElementById('backupApiKeyInput');
+    if (sel.value) {
+      keyInput.style.display = 'block';
+      // 如果备选平台和主平台相同，提示
+      if (sel.value === selectedPlatform) {
+        keyInput.placeholder = '⚠️ 备选平台不应与主平台相同';
+      } else {
+        keyInput.placeholder = PLATFORMS[sel.value].name + ' API Key';
+      }
+    } else {
+      keyInput.style.display = 'none';
     }
   }
 
@@ -1705,6 +1771,8 @@
     const apiKey = document.getElementById('apiKeyInput').value.trim();
     const model = document.getElementById('modelInput').value.trim();
     const apiUrl = document.getElementById('apiUrlInput').value.trim();
+    const backupPlatform = document.getElementById('backupPlatformSelect').value;
+    const backupKey = document.getElementById('backupApiKeyInput').value.trim();
 
     if (!apiKey) {
       showToast('请输入 API Key');
@@ -1712,6 +1780,14 @@
     }
     if (selectedPlatform === 'custom' && !apiUrl) {
       showToast('请填写 API 地址');
+      return;
+    }
+    if (backupPlatform && !backupKey) {
+      showToast('请输入备选平台 API Key');
+      return;
+    }
+    if (backupPlatform && backupPlatform === selectedPlatform) {
+      showToast('备选平台不能与主平台相同');
       return;
     }
 
@@ -1724,8 +1800,20 @@
     if (selectedPlatform === 'custom') {
       localStorage.setItem('llm_api_url', apiUrl);
     }
+    // 保存备选平台
+    if (backupPlatform && backupKey) {
+      localStorage.setItem('llm_backup_platform', backupPlatform);
+      localStorage.setItem('llm_backup_key', backupKey);
+    } else {
+      localStorage.removeItem('llm_backup_platform');
+      localStorage.removeItem('llm_backup_key');
+    }
 
-    showToast('✅ 已配置 ' + (config?.name || '自定义') + '，现在回答更准确');
+    let msg = '✅ 已配置 ' + (config?.name || '自定义');
+    if (backupPlatform) {
+      msg += ' + 备选 ' + PLATFORMS[backupPlatform].name;
+    }
+    showToast(msg);
     updateAPIStatus();
     setTimeout(() => toggleAPISettings(), 1500);
   }
@@ -1735,10 +1823,15 @@
     localStorage.removeItem('llm_api_key');
     localStorage.removeItem('llm_model');
     localStorage.removeItem('llm_api_url');
+    localStorage.removeItem('llm_backup_platform');
+    localStorage.removeItem('llm_backup_key');
     document.getElementById('apiKeyInput').value = '';
     document.getElementById('modelInput').value = '';
     document.getElementById('apiUrlInput').value = '';
+    document.getElementById('backupPlatformSelect').value = '';
+    document.getElementById('backupApiKeyInput').value = '';
     selectPlatform('doubao');
+    onBackupPlatformChange();
     showToast('已清除 API 配置，将使用本地模拟回复');
     updateAPIStatus();
   }
@@ -1750,7 +1843,12 @@
       const platform = localStorage.getItem('llm_platform') || 'doubao';
       const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
       const name = PLATFORMS[platform]?.name || platform;
-      statusEl.innerHTML = '✅ 已配置 <b>' + name + '</b>（' + model + '）';
+      const backupPlatform = localStorage.getItem('llm_backup_platform');
+      let html = '✅ 主：<b>' + name + '</b>（' + model + '）';
+      if (backupPlatform) {
+        html += '<br>🔄 备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
+      }
+      statusEl.innerHTML = html;
       statusEl.style.color = '#4CAF50';
     } else {
       statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
