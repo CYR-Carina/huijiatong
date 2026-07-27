@@ -178,14 +178,15 @@
     .message-row.user { flex-direction: row-reverse; }
 
     .avatar {
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .avatar.agent { background: #FFF3E0; }
-    .avatar.user { background: #F5A623; }
+    .avatar.agent { background: #FFF3E0; border: 2px solid #F5A623; }
+    .avatar.user { background: #F5A623; border: 2px solid #E89010; }
 
     .message-content {
       display: flex;
@@ -729,7 +730,7 @@
 <!-- ===== 顶栏 ===== -->
 <header class="header">
   <div class="header-left">
-    <div class="header-logo">🧠</div>
+    <div class="header-logo">🌾</div>
     <div class="header-title-group">
       <span class="header-title">惠家通</span>
       <span class="mode-badge" id="modeBadge">❓ 随便问问</span>
@@ -1172,14 +1173,15 @@
 - 生源地贷款在县教育局办，校园地贷款在学校办
 
 二、国家助学金
-- 平均3300元/年，分档发放（2300/3300/4500元三档）
+- 平均3700元/年，分档发放（2500/3700/5000元三档，高校自主确定）
 - 申请时间：每年9-10月入学后向学校申请
 - 须通过家庭经济困难学生认定
 - 按月发放
+- 全日制在校退役士兵学生全部享受，资助标准3700元/年
 
 三、国家奖学金/励志奖学金
-- 国家奖学金：本科生8000元/年，研究生硕士20000元/年、博士30000元/年
-- 国家励志奖学金：5000元/年，奖励品学兼优的家庭经济困难学生
+- 国家奖学金：本专科生10000元/年（每年奖励12万名），研究生硕士20000元/年、博士30000元/年
+- 国家励志奖学金：6000元/年，奖励品学兼优的家庭经济困难学生
 - 申请时间：每年9-10月
 
 四、绿色通道
@@ -1380,10 +1382,10 @@
       return '**绿色通道**是高校为家庭经济困难新生设立的 **"先报到、后缴费"** 的入学通道。\n\n即使暂时无法缴纳学费和住宿费，也能先办理入学手续，确保**不因学费问题失学**。';
     }
     if (t.includes('奖学金') && t.includes('多少钱')) {
-      return '**国家奖学金**：**8000元/年**，奖励特别优秀的全日制本专科生，一次性发放。\n\n**国家励志奖学金**：**5000元/年**，奖励品学兼优的家庭经济困难学生。\n\n以当年官方政策为准。';
+      return '**国家奖学金**：**10000元/年**（本专科生），奖励特别优秀的全日制本专科生，每年奖励12万名，颁发国家统一印制的荣誉证书。\n\n**国家励志奖学金**：**6000元/年**，奖励品学兼优的家庭经济困难学生。\n\n以当年官方政策为准。';
     }
     if (t.includes('助学金') && t.includes('多少钱')) {
-      return '**国家助学金**平均资助标准为 **3300元/年**，分档发放（一般分为2300/3300/4500元三档）。\n\n申请时间：每年 **9-10月** 入学后向学校申请。\n发放方式：**按月发放**。\n\n以当年官方政策为准。';
+      return '**国家助学金**平均资助标准为 **3700元/年**，分档发放（高校在2500-5000元范围内自主确定，可分为2-3档）。\n\n全日制在校退役士兵学生全部享受，资助标准为 **3700元/年**。\n\n申请时间：每年 **9-10月** 入学后向学校申请。\n发放方式：**按月发放**。\n\n以当年官方政策为准。';
     }
     if (t.includes('勤工助学')) {
       return '**勤工助学**是学校为家庭经济困难学生提供的校内工作岗位。\n\n- 每月约 **300-800元**\n- 岗位类型：图书馆助理、实验室助理、行政助理等\n- 不影响学习时间\n\n入学后可向学校资助中心申请。';
@@ -1456,8 +1458,8 @@
           ? '**' + uniCnt + '个大学生**每人每年可贷最高 **20000元**，合计最高 **' + (uniCnt * 20000) + '元/年**'
           : '上大学后可申请，最高 **20000元/年**';
         let grantMsg = uniCnt > 0
-          ? uniCnt + '个大学生入学后可申请，平均 **3300元/年/人**，合计约 **' + (uniCnt * 3300) + '元/年**'
-          : '上大学后入学即可申请，平均 **3300元/年**';
+          ? uniCnt + '个大学生入学后可申请，平均 **3700元/年/人**，合计约 **' + (uniCnt * 3700) + '元/年**'
+          : '上大学后入学即可申请，平均 **3700元/年**';
         let grantDetail = uniCnt > 0
           ? '\n- 按月发放，9-10月向学校申请'
           : '，按月发放';
@@ -1475,7 +1477,7 @@
 
         // 预估金额表格
         let totalLoan = uniCnt * 20000;
-        let totalGrant = uniCnt * 3300;
+        let totalGrant = uniCnt * 3700;
         let totalWork = uniCnt * 300 * 12 + '~' + (uniCnt * 800 * 12);
         let table = '\n\n### 预估年度资助总额\n\n| 项目 | 金额（以当年政策为准） |\n|:-----|:-----|\n| 助学贷款（' + uniCnt + '人） | 最高 ' + totalLoan + '元 |\n| 助学金（' + uniCnt + '人） | 约 ' + totalGrant + '元 |\n| 勤工助学（' + uniCnt + '人） | 约 ' + totalWork + '元 |\n| 义务教育补助 | 按当地标准 |';
 
@@ -1550,7 +1552,7 @@
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar ' + role;
-    avatar.textContent = role === 'agent' ? '🧠' : '👤';
+    avatar.textContent = role === 'agent' ? '🌾' : '👨‍👩‍👧';
 
     const content = document.createElement('div');
     content.className = 'message-content';
@@ -1587,7 +1589,7 @@
     const row = document.createElement('div');
     row.className = 'message-row';
     row.id = 'loadingRow';
-    row.innerHTML = '<div class="avatar agent">🧠</div><div class="message-content"><div class="bubble agent"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
+    row.innerHTML = '<div class="avatar agent">🌾</div><div class="message-content"><div class="bubble agent"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
     conv.appendChild(row);
     conv.scrollTop = conv.scrollHeight;
   }
@@ -1599,15 +1601,63 @@
   // ===== 语音控制 =====
   let currentUtter = null;
   let isSpeaking = false;
+  let voicesReady = false;
+
+  // 移动端需要用户交互后才能使用 speechSynthesis，预先加载 voices
+  function initVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      voicesReady = true;
+    }
+  }
+  if ('speechSynthesis' in window) {
+    initVoices();
+    window.speechSynthesis.onvoiceschanged = function() {
+      initVoices();
+    };
+    // iOS/Android 首次触摸解锁语音
+    document.addEventListener('touchstart', function unlockSpeech() {
+      try {
+        const u = new SpeechSynthesisUtterance('');
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+        window.speechSynthesis.cancel();
+      } catch(e) {}
+      document.removeEventListener('touchstart', unlockSpeech);
+    }, { once: true });
+    // 桌面端点击解锁
+    document.addEventListener('click', function unlockSpeech() {
+      try {
+        const u = new SpeechSynthesisUtterance('');
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+        window.speechSynthesis.cancel();
+      } catch(e) {}
+      document.removeEventListener('click', unlockSpeech);
+    }, { once: true });
+  }
 
   function speakText(text) {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window)) {
+      showToast('当前浏览器不支持语音播放');
+      return;
+    }
     // 停止当前朗读
     window.speechSynthesis.cancel();
     if (currentUtter) currentUtter = null;
-    const utter = new SpeechSynthesisUtterance(text.replace(/\s+/g, ''));
+    const cleanText = text.replace(/\s+/g, ' ');
+    const utter = new SpeechSynthesisUtterance(cleanText);
     utter.lang = 'zh-CN';
     utter.rate = speechRate;
+    utter.volume = 1;
+    utter.pitch = 1;
+    // 优先选择中文女声
+    const voices = window.speechSynthesis.getVoices();
+    const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting/i.test(v.name))
+                 || voices.find(v => v.lang === 'zh-CN')
+                 || voices.find(v => v.lang.startsWith('zh'));
+    if (zhVoice) utter.voice = zhVoice;
     currentUtter = utter;
     isSpeaking = true;
     document.getElementById('stopBtn').style.display = 'flex';
@@ -1616,7 +1666,14 @@
       if (document.getElementById('stopBtn'))
         document.getElementById('stopBtn').style.display = 'none';
     };
-    window.speechSynthesis.speak(utter);
+    utter.onerror = function(e) {
+      console.warn('语音播放错误:', e);
+      isSpeaking = false;
+      const stopBtn = document.getElementById('stopBtn');
+      if (stopBtn) stopBtn.style.display = 'none';
+    };
+    // iOS 需要异步调用
+    setTimeout(() => window.speechSynthesis.speak(utter), 50);
   }
 
   function stopSpeech() {
