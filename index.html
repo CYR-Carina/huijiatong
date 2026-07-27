@@ -54,13 +54,16 @@
       gap: 12px;
     }
     .header-logo {
-      font-size: 26px;
+      font-size: 22px;
+      font-weight: 900;
       width: 46px; height: 46px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15));
+      background: linear-gradient(135deg, #fff 0%, #FFF0E0 100%);
       border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
+      color: #C85A28;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
       animation: logoFloat 3s ease-in-out infinite;
+      flex-shrink: 0;
     }
     @keyframes logoFloat {
       0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -110,6 +113,14 @@
     }
     .identity-btn:hover { background: rgba(255,255,255,0.3); }
     .identity-btn:active { transform: scale(0.96); }
+    #identityIcon {
+      font-size: 12px;
+      font-weight: 700;
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
     .identity-dropdown {
       position: absolute;
       top: calc(100% + 6px);
@@ -141,7 +152,15 @@
       color: #C85A28;
       font-weight: 600;
     }
-    .identity-option .icon { font-size: 20px; }
+    .identity-option .icon {
+      font-size: 13px;
+      font-weight: 700;
+      width: 24px; height: 24px;
+      background: #FFF0E0;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #C85A28;
+    }
     .identity-option .check {
       margin-left: auto;
       display: none;
@@ -160,7 +179,7 @@
       position: relative;
       z-index: 1;
       border-radius: 0 0 20px 20px;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .container.funding-mode { box-shadow: 0 0 40px rgba(232,116,60,0.08); }
@@ -205,12 +224,13 @@
       width: 44px; height: 44px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 16px;
+      font-weight: 800;
       flex-shrink: 0;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .avatar.agent { background: #FFF5EB; border: 2px solid #E8743C; }
-    .avatar.user { background: #E8743C; border: 2px solid #A84820; }
+    .avatar.agent { background: #FFF5EB; border: 2px solid #E8743C; color: #C85A28; }
+    .avatar.user { background: #E8743C; border: 2px solid #A84820; color: #fff; }
 
     .message-content {
       display: flex;
@@ -387,6 +407,8 @@
       line-height: 1.8;
       border-top: 1px dashed #B5CDF0;
       padding-top: 12px;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .story-card .story-body.show { display: block; animation: fadeIn 0.3s; }
 
@@ -427,7 +449,8 @@
     .quick-action:hover::before { opacity: 1; }
     .quick-action:active { transform: scale(0.94); }
     .quick-action .qa-icon {
-      font-size: 26px;
+      font-size: 22px;
+      font-weight: 800;
       display: inline-flex;
       width: 48px; height: 48px;
       background: linear-gradient(135deg, #FFF5EB, #FFE5D0);
@@ -436,6 +459,7 @@
       margin-bottom: 6px;
       box-shadow: 0 2px 6px rgba(232,116,60,0.12);
       transition: transform 0.3s;
+      color: #C85A28;
     }
     .quick-action:hover .qa-icon {
       transform: scale(1.1) rotate(-5deg);
@@ -502,7 +526,9 @@
       background: linear-gradient(135deg, #4A90D9, #2C5282);
       border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
       flex-shrink: 0;
       box-shadow: 0 3px 8px rgba(74,144,217,0.3);
     }
@@ -652,17 +678,19 @@
       position: fixed;
       bottom: 180px;
       right: max(calc(50vw - 260px + 16px), 16px);
-      width: 52px; height: 52px;
+      width: 48px; height: 48px;
       border: none;
       background: #E8743C;
       border-radius: 50%;
-      font-size: 24px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(232,116,60,0.4);
       transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
       z-index: 50;
       display: flex; align-items: center; justify-content: center;
-      opacity: 0.55;
+      opacity: 0.5;
     }
     .faq-fab:hover {
       opacity: 1;
@@ -676,18 +704,20 @@
       position: fixed;
       bottom: 240px;
       right: max(calc(50vw - 260px + 16px), 16px);
-      width: 52px; height: 52px;
+      width: 48px; height: 48px;
       border: 2px solid #E8743C;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      font-size: 24px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #C85A28;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(0,0,0,0.15);
       transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
       z-index: 50;
       display: flex; align-items: center; justify-content: center;
       animation: apiFabPulse 2.5s ease-in-out infinite;
-      opacity: 0.55;
+      opacity: 0.5;
     }
     .api-fab:hover {
       opacity: 1;
@@ -700,7 +730,7 @@
       50% { box-shadow: 0 4px 24px rgba(232,116,60,0.7); }
     }
     @media (max-width: 600px) {
-      .api-fab { right: 16px; bottom: 230px; width: 48px; height: 48px; font-size: 22px; }
+      .api-fab { right: 16px; bottom: 230px; width: 44px; height: 44px; font-size: 13px; }
     }
 
     /* ===== FAQ 弹窗 ===== */
@@ -758,7 +788,16 @@
     }
     .faq-category:last-child { border-bottom: none; }
     .faq-category:hover { background: #FFF8E7; }
-    .faq-category .faq-icon { font-size: 22px; }
+    .faq-category .faq-icon {
+      font-size: 12px;
+      font-weight: 800;
+      width: 26px; height: 26px;
+      background: #FFF0E0;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #C85A28;
+      flex-shrink: 0;
+    }
     .faq-category .faq-name { font-size: 15px; color: #333; flex: 1; }
     .faq-category .faq-count { font-size: 12px; color: #bbb; }
     .faq-category .faq-arrow { color: #ccc; font-size: 14px; }
@@ -845,27 +884,27 @@
 <!-- ===== 顶栏 ===== -->
 <header class="header">
   <div class="header-left">
-    <div class="header-logo">�</div>
+    <div class="header-logo">惠</div>
     <div class="header-title-group">
       <span class="header-title">惠家通</span>
-      <span class="mode-badge" id="modeBadge">❓ 随便问问</span>
+      <span class="mode-badge" id="modeBadge">? 随便问问</span>
     </div>
   </div>
   <div class="identity-select">
     <button class="identity-btn" id="identityBtn" onclick="toggleIdentity()">
-      <span id="identityIcon">❓</span>
+      <span id="identityIcon">?</span>
       <span id="identityLabel">随便问问</span>
       <span>▾</span>
     </button>
     <div class="identity-dropdown" id="identityDropdown">
-      <div class="identity-option" onclick="selectIdentity('funding','📚','学生/家长')">
-        <span class="icon">📚</span><span>学生/家长</span><span class="check">✓</span>
+      <div class="identity-option" onclick="selectIdentity('funding','学','学生/家长')">
+        <span class="icon">学</span><span>学生/家长</span><span class="check">✓</span>
       </div>
-      <div class="identity-option" onclick="selectIdentity('elderly','👴','老人家')">
-        <span class="icon">👴</span><span>老人家</span><span class="check">✓</span>
+      <div class="identity-option" onclick="selectIdentity('elderly','老','老人家')">
+        <span class="icon">老</span><span>老人家</span><span class="check">✓</span>
       </div>
-      <div class="identity-option active" onclick="selectIdentity('general','❓','随便问问')">
-        <span class="icon">❓</span><span>随便问问</span><span class="check">✓</span>
+      <div class="identity-option active" onclick="selectIdentity('general','?','随便问问')">
+        <span class="icon">?</span><span>随便问问</span><span class="check">✓</span>
       </div>
     </div>
   </div>
@@ -876,23 +915,23 @@
   <div class="conversation" id="conversation">
     <!-- 欢迎卡片 -->
     <div class="welcome-card" id="welcomeCard">
-      <div class="title">🏡 欢迎来到惠家通</div>
+      <div class="title">♥ 欢迎来到惠家通</div>
       <div class="desc">
         我是您的乡村家庭智能服务助手。<br>
         一个 Agent，服务全家——学生问资助，老人防诈骗，全家享便利。
       </div>
       <div class="tags">
-        <span>📚 资助政策</span>
-        <span>🛡️ 防诈骗</span>
-        <span>🏥 健康科普</span>
-        <span>👴 养老政策</span>
+        <span>资助政策</span>
+        <span>防诈骗</span>
+        <span>健康科普</span>
+        <span>养老政策</span>
       </div>
     </div>
 
     <!-- 三下乡故事 -->
     <div class="story-card" id="storyCard" onclick="toggleStory()">
       <div class="story-header">
-        <span class="story-title">� 从三下乡中来 — 项目背景故事</span>
+        <span class="story-title">★ 从三下乡中来 — 项目背景故事</span>
         <span class="story-toggle" id="storyToggle">▾</span>
       </div>
       <div class="story-body" id="storyBody">
@@ -908,22 +947,22 @@
     <!-- 快捷操作卡片 -->
     <div class="quick-actions general" id="quickActions">
       <div class="quick-action" onclick="quickAsk('助学贷款能贷多少钱？')">
-        <span class="qa-icon">💰</span>
+        <span class="qa-icon">￥</span>
         <span class="qa-label">助学贷款</span>
         <span class="qa-desc">了解额度和申请条件</span>
       </div>
       <div class="quick-action" onclick="quickAsk('有人打电话说我中奖了是诈骗吗？')">
-        <span class="qa-icon">🛡️</span>
+        <span class="qa-icon">!</span>
         <span class="qa-label">防诈骗</span>
         <span class="qa-desc">识别常见骗局</span>
       </div>
       <div class="quick-action" onclick="quickAsk('高血压平时要注意什么？')">
-        <span class="qa-icon">❤️</span>
+        <span class="qa-icon">+</span>
         <span class="qa-label">健康养生</span>
         <span class="qa-desc">慢病管理建议</span>
       </div>
       <div class="quick-action" onclick="quickAsk('养老金怎么领？')">
-        <span class="qa-icon">👴</span>
+        <span class="qa-icon">60</span>
         <span class="qa-label">养老政策</span>
         <span class="qa-desc">养老金和医保查询</span>
       </div>
@@ -932,9 +971,9 @@
     <!-- 条件自测入口 -->
     <div class="self-test-card" id="selfTestCard" onclick="startSelfTest()">
       <div class="st-row">
-        <div class="st-icon">📋</div>
+        <div class="st-icon">测</div>
         <div>
-          <div class="st-title">🔍 条件自测</div>
+          <div class="st-title">条件自测</div>
           <div class="st-desc">输入家庭情况，智能推荐适合您的资助项目</div>
         </div>
         <span class="st-arrow">→</span>
@@ -947,7 +986,7 @@
     <div class="input-row">
       <input type="text" class="text-input" id="textInput"
              placeholder="输入您的问题..." onkeypress="if(event.key==='Enter')sendMessage()">
-      <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="语音输入">🎤</button>
+      <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="语音输入">◉</button>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送">➤</button>
     </div>
     <div class="speed-switch">
@@ -967,66 +1006,66 @@
 </button>
 
 <!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
-<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">⚙️</button>
-<button class="faq-fab" onclick="toggleFAQ()" title="常见问题">❓</button>
+<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">设</button>
+<button class="faq-fab" onclick="toggleFAQ()" title="常见问题">?</button>
 
 <!-- ===== FAQ 弹窗 ===== -->
 <div class="faq-modal" id="faqModal" onclick="if(event.target===this)toggleFAQ()">
   <div class="faq-card">
     <div class="faq-header">
-      <span>❓ 常见问题</span>
-      <button class="faq-close" onclick="toggleFAQ()">✕</button>
+      <span>? 常见问题</span>
+      <button class="faq-close" onclick="toggleFAQ()">×</button>
     </div>
     <div class="faq-body" id="faqBody">
       <div class="faq-category" onclick="toggleSub(this)">
-        <span class="faq-icon">📚</span>
+        <span class="faq-icon">学</span>
         <span class="faq-name">资助政策</span>
         <span class="faq-count">6个问题</span>
         <span class="faq-arrow">▸</span>
       </div>
       <div class="faq-sub">
-        <div class="faq-item" onclick="askFAQ('助学贷款能贷多少钱？')">💰 助学贷款能贷多少钱？</div>
-        <div class="faq-item" onclick="askFAQ('助学贷款怎么申请？需要什么材料？')">📝 助学贷款怎么申请？</div>
-        <div class="faq-item" onclick="askFAQ('什么是绿色通道？')">🚪 什么是绿色通道？</div>
-        <div class="faq-item" onclick="askFAQ('国家奖学金多少钱？')">🏆 国家奖学金多少钱？</div>
-        <div class="faq-item" onclick="askFAQ('国家助学金多少钱？')">🎓 国家助学金多少钱？</div>
-        <div class="faq-item" onclick="askFAQ('勤工助学能赚多少钱？')">💼 勤工助学能赚多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('助学贷款能贷多少钱？')">助学贷款能贷多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('助学贷款怎么申请？需要什么材料？')">助学贷款怎么申请？</div>
+        <div class="faq-item" onclick="askFAQ('什么是绿色通道？')">什么是绿色通道？</div>
+        <div class="faq-item" onclick="askFAQ('国家奖学金多少钱？')">国家奖学金多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('国家助学金多少钱？')">国家助学金多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('勤工助学能赚多少钱？')">勤工助学能赚多少钱？</div>
       </div>
       <div class="faq-category" onclick="toggleSub(this)">
-        <span class="faq-icon">🛡️</span>
+        <span class="faq-icon">!</span>
         <span class="faq-name">防诈骗</span>
         <span class="faq-count">4个问题</span>
         <span class="faq-arrow">▸</span>
       </div>
       <div class="faq-sub">
-        <div class="faq-item" onclick="askFAQ('有人打电话说我中奖了是诈骗吗？')">📞 中奖电话是诈骗吗？</div>
-        <div class="faq-item" onclick="askFAQ('有人冒充警察说我涉案了怎么办？')">👮 冒充公检法诈骗</div>
-        <div class="faq-item" onclick="askFAQ('保健品诈骗是什么？')">💊 保健品诈骗是什么？</div>
-        <div class="faq-item" onclick="askFAQ('遇到诈骗怎么办？')">🚨 遇到诈骗怎么办？</div>
+        <div class="faq-item" onclick="askFAQ('有人打电话说我中奖了是诈骗吗？')">中奖电话是诈骗吗？</div>
+        <div class="faq-item" onclick="askFAQ('有人冒充警察说我涉案了怎么办？')">冒充公检法诈骗</div>
+        <div class="faq-item" onclick="askFAQ('保健品诈骗是什么？')">保健品诈骗是什么？</div>
+        <div class="faq-item" onclick="askFAQ('遇到诈骗怎么办？')">遇到诈骗怎么办？</div>
       </div>
       <div class="faq-category" onclick="toggleSub(this)">
-        <span class="faq-icon">🏥</span>
+        <span class="faq-icon">+</span>
         <span class="faq-name">健康养生</span>
         <span class="faq-count">4个问题</span>
         <span class="faq-arrow">▸</span>
       </div>
       <div class="faq-sub">
-        <div class="faq-item" onclick="askFAQ('高血压平时要注意什么？')">❤️ 高血压注意事项</div>
-        <div class="faq-item" onclick="askFAQ('糖尿病平时要注意什么？')">🩸 糖尿病注意事项</div>
-        <div class="faq-item" onclick="askFAQ('保健品能代替药品吗？')">💊 保健品能代替药品吗？</div>
-        <div class="faq-item" onclick="askFAQ('老年人每年应该做什么检查？')">🏥 老年人每年体检建议</div>
+        <div class="faq-item" onclick="askFAQ('高血压平时要注意什么？')">高血压注意事项</div>
+        <div class="faq-item" onclick="askFAQ('糖尿病平时要注意什么？')">糖尿病注意事项</div>
+        <div class="faq-item" onclick="askFAQ('保健品能代替药品吗？')">保健品能代替药品吗？</div>
+        <div class="faq-item" onclick="askFAQ('老年人每年应该做什么检查？')">老年人每年体检建议</div>
       </div>
       <div class="faq-category" onclick="toggleSub(this)">
-        <span class="faq-icon">👴</span>
+        <span class="faq-icon">老</span>
         <span class="faq-name">养老政策</span>
         <span class="faq-count">4个问题</span>
         <span class="faq-arrow">▸</span>
       </div>
       <div class="faq-sub">
-        <div class="faq-item" onclick="askFAQ('养老金怎么领？需要什么条件？')">💰 养老金领取条件</div>
-        <div class="faq-item" onclick="askFAQ('养老金每月能领多少钱？')">📊 养老金标准</div>
-        <div class="faq-item" onclick="askFAQ('高龄补贴怎么领？')">🎁 高龄补贴政策</div>
-        <div class="faq-item" onclick="askFAQ('社保卡丢了怎么办？')">💳 社保卡挂失补办</div>
+        <div class="faq-item" onclick="askFAQ('养老金怎么领？需要什么条件？')">养老金领取条件</div>
+        <div class="faq-item" onclick="askFAQ('养老金每月能领多少钱？')">养老金标准</div>
+        <div class="faq-item" onclick="askFAQ('高龄补贴怎么领？')">高龄补贴政策</div>
+        <div class="faq-item" onclick="askFAQ('社保卡丢了怎么办？')">社保卡挂失补办</div>
       </div>
     </div>
   </div>
@@ -1036,30 +1075,30 @@
 <div class="api-modal" id="apiModal" onclick="if(event.target===this)toggleAPISettings()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="font-size:20px;color:#333;">⚙️ API 设置</h3>
-      <button onclick="toggleAPISettings()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">✕</button>
+      <h3 style="font-size:20px;color:#333;">API 设置</h3>
+      <button onclick="toggleAPISettings()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">×</button>
     </div>
 
     <!-- 平台选择 -->
     <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">选择平台</label>
     <div id="platformOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
       <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;">
-        <div style="font-size:22px;">🔥</div>
+        <div style="font-size:18px;font-weight:800;color:#E8743C;">豆</div>
         <div style="font-size:13px;font-weight:600;color:#333;">豆包</div>
         <div style="font-size:11px;color:#888;">50万+200万/天</div>
       </div>
       <div onclick="selectPlatform('zhipu')" data-platform="zhipu" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:22px;">🧠</div>
+        <div style="font-size:18px;font-weight:800;color:#4CAF50;">智</div>
         <div style="font-size:13px;font-weight:600;color:#333;">智谱AI</div>
         <div style="font-size:11px;color:#4CAF50;">免费不限量</div>
       </div>
       <div onclick="selectPlatform('siliconflow')" data-platform="siliconflow" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:22px;">⚡</div>
+        <div style="font-size:18px;font-weight:800;color:#9C27B0;">硅</div>
         <div style="font-size:13px;font-weight:600;color:#333;">硅基流动</div>
         <div style="font-size:11px;color:#888;">2000万Token</div>
       </div>
       <div onclick="selectPlatform('custom')" data-platform="custom" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:22px;">🔧</div>
+        <div style="font-size:18px;font-weight:800;color:#607D8B;">自</div>
         <div style="font-size:13px;font-weight:600;color:#333;">自定义</div>
         <div style="font-size:11px;color:#888;">OpenAI兼容</div>
       </div>
@@ -1144,22 +1183,22 @@
 
     const actions = {
       funding: [
-        { icon: '💰', label: '助学贷款', desc: '额度·申请·材料', ask: '助学贷款能贷多少钱？' },
-        { icon: '🎓', label: '助学金', desc: '申请条件和标准', ask: '国家助学金多少钱？' },
-        { icon: '🏆', label: '奖学金', desc: '国奖·励志奖', ask: '国家奖学金多少钱？' },
-        { icon: '💡', label: '申请流程', desc: '手把手教你办', ask: '助学贷款怎么申请？' }
+        { icon: '￥', label: '助学贷款', desc: '额度·申请·材料', ask: '助学贷款能贷多少钱？' },
+        { icon: '补', label: '助学金', desc: '申请条件和标准', ask: '国家助学金多少钱？' },
+        { icon: '奖', label: '奖学金', desc: '国奖·励志奖', ask: '国家奖学金多少钱？' },
+        { icon: '?', label: '申请流程', desc: '手把手教你办', ask: '助学贷款怎么申请？' }
       ],
       elderly: [
-        { icon: '🛡️', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
-        { icon: '❤️', label: '高血压', desc: '日常注意事项', ask: '高血压平时要注意什么？' },
-        { icon: '💰', label: '养老金', desc: '领取条件和标准', ask: '养老金怎么领？' },
-        { icon: '💳', label: '社保卡', desc: '挂失和补办', ask: '社保卡丢了怎么办？' }
+        { icon: '!', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
+        { icon: '+', label: '高血压', desc: '日常注意事项', ask: '高血压平时要注意什么？' },
+        { icon: '60', label: '养老金', desc: '领取条件和标准', ask: '养老金怎么领？' },
+        { icon: '卡', label: '社保卡', desc: '挂失和补办', ask: '社保卡丢了怎么办？' }
       ],
       general: [
-        { icon: '💰', label: '助学贷款', desc: '了解额度和条件', ask: '助学贷款能贷多少钱？' },
-        { icon: '🛡️', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
-        { icon: '❤️', label: '健康养生', desc: '慢病管理建议', ask: '高血压平时要注意什么？' },
-        { icon: '👴', label: '养老政策', desc: '养老金和医保', ask: '养老金怎么领？' }
+        { icon: '￥', label: '助学贷款', desc: '了解额度和条件', ask: '助学贷款能贷多少钱？' },
+        { icon: '!', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
+        { icon: '+', label: '健康养生', desc: '慢病管理建议', ask: '高血压平时要注意什么？' },
+        { icon: '60', label: '养老政策', desc: '养老金和医保', ask: '养老金怎么领？' }
       ]
     };
 
@@ -1190,7 +1229,7 @@
     document.querySelectorAll('.identity-option').forEach(o => o.classList.remove('active'));
     event.currentTarget.classList.add('active');
 
-    let modeLabel = mode === 'funding' ? '📚 资助政策通' : mode === 'elderly' ? '👴 银龄小保' : '❓ 随便问问';
+    let modeLabel = mode === 'funding' ? '学 资助政策通' : mode === 'elderly' ? '老 银龄小保' : '? 随便问问';
     const badge = document.getElementById('modeBadge');
     badge.textContent = modeLabel;
     badge.classList.remove('pop');
@@ -1242,25 +1281,25 @@
       name: '豆包（火山引擎）',
       apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
       defaultModel: 'doubao-3-5-32k-250428',
-      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
+      tip: '<b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
     },
     zhipu: {
       name: '智谱AI（GLM）',
       apiUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
       defaultModel: 'glm-4-flash',
-      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
+      tip: '<b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
     },
     siliconflow: {
       name: '硅基流动',
       apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
       defaultModel: 'deepseek-ai/DeepSeek-V3',
-      tip: '⚡ <b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
+      tip: '<b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
     },
     custom: {
       name: '自定义平台',
       apiUrl: '',
       defaultModel: '',
-      tip: '🔧 <b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
+      tip: '<b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
     }
   };
 
@@ -1494,7 +1533,7 @@
       return '**全日制普通本专科学生**每人每年最高 **20000元**，**研究生**最高 **25000元**。\n\n以当年官方政策为准。';
     }
     if (t.includes('助学贷款') && t.includes('申请')) {
-      return '**生源地助学贷款申请流程（4步）：**\n\n**①** 每年 **7月15日-9月30日** 到县教育局办理\n**②** 携带材料：录取通知书、身份证、户口本、共同借款人身份证\n**③** 现场签订借款合同，领取受理证明\n**④** 入学后提交受理证明给高校\n\n> 📌 国家资助热线：**010-66097980**';
+      return '**生源地助学贷款申请流程（4步）：**\n\n**1.** 每年 **7月15日-9月30日** 到县教育局办理\n**2.** 携带材料：录取通知书、身份证、户口本、共同借款人身份证\n**3.** 现场签订借款合同，领取受理证明\n**4.** 入学后提交受理证明给高校\n\n> 国家资助热线：**010-66097980**';
     }
     if (t.includes('绿色通道')) {
       return '**绿色通道**是高校为家庭经济困难新生设立的 **"先报到、后缴费"** 的入学通道。\n\n即使暂时无法缴纳学费和住宿费，也能先办理入学手续，确保**不因学费问题失学**。';
@@ -1590,7 +1629,7 @@
           let eduChildren = [];
           if (midCnt > 0) eduChildren.push(midCnt + '个初中');
           if (priCnt > 0) eduChildren.push(priCnt + '个小学');
-          eduSection = '\n\n**5️⃣ 义务教育阶段资助**\n- ' + eduChildren.join('和') + '的孩子可享受 **"两免一补"**（免学杂费、免课本费、补助寄宿生生活费）\n- 具体标准以当地政策为准';
+          eduSection = '\n\n**5. 义务教育阶段资助**\n- ' + eduChildren.join('和') + '的孩子可享受 **"两免一补"**（免学杂费、免课本费、补助寄宿生生活费）\n- 具体标准以当地政策为准';
         }
 
         // 预估金额表格
@@ -1599,53 +1638,53 @@
         let totalWork = uniCnt * 300 * 12 + '~' + (uniCnt * 800 * 12);
         let table = '\n\n### 预估年度资助总额\n\n| 项目 | 金额（以当年政策为准） |\n|:-----|:-----|\n| 助学贷款（' + uniCnt + '人） | 最高 ' + totalLoan + '元 |\n| 助学金（' + uniCnt + '人） | 约 ' + totalGrant + '元 |\n| 勤工助学（' + uniCnt + '人） | 约 ' + totalWork + '元 |\n| 义务教育补助 | 按当地标准 |';
 
-        let reminder = '\n\n> 💡 **关键提醒**：年收入' + income + '万供' + cnt + '个孩子读书，压力确实大。**7-9月**先办助学贷款，**9-10月**入学后办助学金，两个时间不冲突。\n\n需要我列出详细的**申请时间表和材料清单**吗？';
+        let reminder = '\n\n> **关键提醒**：年收入' + income + '万供' + cnt + '个孩子读书，压力确实大。**7-9月**先办助学贷款，**9-10月**入学后办助学金，两个时间不冲突。\n\n需要我列出详细的**申请时间表和材料清单**吗？';
 
-        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n---\n\n### 推荐方案（按优先级排序）\n\n**1️⃣ 生源地信用助学贷款**（最优先）\n' + loanMsg + subDetail + '\n\n**2️⃣ 国家助学金**\n- ' + grantMsg + grantDetail + '\n\n**3️⃣ 绿色通道**\n- 大学生报到当天没带够学费，可**先入学后缴费**\n\n**4️⃣ 勤工助学**\n- ' + uniCnt + '个大学生可申请校内岗位，每月约 **300-800元/人**' + eduSection + table + reminder;
+        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n---\n\n### 推荐方案（按优先级排序）\n\n**1. 生源地信用助学贷款**（最优先）\n' + loanMsg + subDetail + '\n\n**2. 国家助学金**\n- ' + grantMsg + grantDetail + '\n\n**3. 绿色通道**\n- 大学生报到当天没带够学费，可**先入学后缴费**\n\n**4. 勤工助学**\n- ' + uniCnt + '个大学生可申请校内岗位，每月约 **300-800元/人**' + eduSection + table + reminder;
       }
       return '好的，我来帮您做条件自测！\n\n请告诉我以下信息：\n**①** 家庭年收入（万元）\n**②** 家里有几个孩子在上学\n**③** 最高学历阶段（初中/高中/大学/大专）\n**④** 是否有特殊困难（残疾/重病/低保等）\n\n您可以直接告诉我，比如："年收入3万，两个孩子，一个高中一个大学"';
     }
 
     // 防诈骗类
     if (t.includes('中奖') && (t.includes('电话') || t.includes('诈骗'))) {
-      return '⚠️ **重要提醒：这是诈骗！**\n\n**特征分析：**\n❌ 声称中奖 — 正规中奖不需要提前交钱\n❌ 要求交手续费 — 典型骗局\n\n**✅ 正确做法：**\n• 不要转账，不提供验证码\n• 挂断电话，不要回拨\n• 联系村干部或拨打 **110**\n\n> 📌 记住：**凡是让您先交钱才能领奖的，都是诈骗！**';
+      return '**重要提醒：这是诈骗！**\n\n**特征分析：**\n× 声称中奖 — 正规中奖不需要提前交钱\n× 要求交手续费 — 典型骗局\n\n**正确做法：**\n• 不要转账，不提供验证码\n• 挂断电话，不要回拨\n• 联系村干部或拨打 **110**\n\n> 记住：**凡是让您先交钱才能领奖的，都是诈骗！**';
     }
     if (t.includes('冒充') && (t.includes('警察') || t.includes('公检法'))) {
-      return '⚠️ **重要提醒：这是冒充公检法诈骗！**\n\n**套路分析：**\n❌ 骗子冒充警察/法官，说您涉嫌犯罪\n❌ 要求您转账到"安全账户"验证资金\n\n**✅ 正确做法：**\n• **挂断电话**，公安机关不会电话办案\n• **不要转账**，没有"安全账户"这回事\n• 拨打 **110** 核实\n\n> 📌 公检法机关不会通过电话要求转账！';
+      return '**重要提醒：这是冒充公检法诈骗！**\n\n**套路分析：**\n× 骗子冒充警察/法官，说您涉嫌犯罪\n× 要求您转账到"安全账户"验证资金\n\n**正确做法：**\n• **挂断电话**，公安机关不会电话办案\n• **不要转账**，没有"安全账户"这回事\n• 拨打 **110** 核实\n\n> 公检法机关不会通过电话要求转账！';
     }
     if (t.includes('保健品诈骗') || (t.includes('保健品') && t.includes('诈骗'))) {
-      return '⚠️ **保健品诈骗常见套路：**\n\n**① 免费诱饵：** 免费体检、免费讲座、免费领鸡蛋\n**② 情感陪护：** 亲切喊"爸妈"，关心您的身体\n**③ 夸大病情：** 说您身体有大问题，制造恐慌\n**④ 高价推销：** 卖出比成本高几十倍的"保健品"\n\n**✅ 防骗要点：**\n• 保健品**不能治病**\n• 认准"蓝帽子"标志\n• 买药去正规药店\n• 不舒服要去正规医院';
+      return '**保健品诈骗常见套路：**\n\n**1. 免费诱饵：** 免费体检、免费讲座、免费领鸡蛋\n**2. 情感陪护：** 亲切喊"爸妈"，关心您的身体\n**3. 夸大病情：** 说您身体有大问题，制造恐慌\n**4. 高价推销：** 卖出比成本高几十倍的"保健品"\n\n**防骗要点：**\n• 保健品**不能治病**\n• 认准"蓝帽子"标志\n• 买药去正规药店\n• 不舒服要去正规医院';
     }
     if (t.includes('遇到诈骗') || (t.includes('诈骗') && t.includes('怎么办'))) {
-      return '🚨 **遇到诈骗怎么办？**\n\n**四步处理：**\n**1️⃣ 停止** — 立刻停止操作，不要转账\n**2️⃣ 挂断** — 挂断电话，不要回拨\n**3️⃣ 联系** — 联系子女/村干部/拨打 **110**\n**4️⃣ 报警** — 保存证据，立即报警\n\n**📞 重要电话：**\n• 报警：**110**\n• 反诈专线：**96110**\n• 国家反诈中心APP：开启来电预警';
+      return '**遇到诈骗怎么办？**\n\n**四步处理：**\n**1. 停止** — 立刻停止操作，不要转账\n**2. 挂断** — 挂断电话，不要回拨\n**3. 联系** — 联系子女/村干部/拨打 **110**\n**4. 报警** — 保存证据，立即报警\n\n**重要电话：**\n• 报警：**110**\n• 反诈专线：**96110**\n• 国家反诈中心APP：开启来电预警';
     }
 
     // 健康科普类
     if (t.includes('高血压') || t.includes('血压高')) {
-      return '❤️ **高血压日常注意事项：**\n\n**🥗 饮食：**\n• 少吃盐，每天不超过 **5克**（一啤酒瓶盖）\n• 多吃蔬菜水果，少吃肥肉\n\n**🏃 运动：**\n• 每天散步 **30分钟**\n• 控制体重\n\n**💊 用药：**\n• **按时吃药**，不要自己停药\n• 坐姿站起时动作要慢\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
+      return '**高血压日常注意事项：**\n\n**饮食：**\n• 少吃盐，每天不超过 **5克**（一啤酒瓶盖）\n• 多吃蔬菜水果，少吃肥肉\n\n**运动：**\n• 每天散步 **30分钟**\n• 控制体重\n\n**用药：**\n• **按时吃药**，不要自己停药\n• 坐姿站起时动作要慢\n\n> 我是科普助手，不能代替医生，不舒服请及时就医。';
     }
     if (t.includes('糖尿病')) {
-      return '🩸 **糖尿病日常注意事项：**\n\n**🥗 饮食：**\n• 少糖少油少盐\n• 每餐米饭不超过一碗\n• 水果选低糖的\n\n**🏃 运动：**\n• 每周运动5-7次，每次30-60分钟\n• 散步、快走即可\n\n**💊 监测：**\n• 定期测血糖\n• 随身带**糖果饼干**，防低血糖\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
+      return '**糖尿病日常注意事项：**\n\n**饮食：**\n• 少糖少油少盐\n• 每餐米饭不超过一碗\n• 水果选低糖的\n\n**运动：**\n• 每周运动5-7次，每次30-60分钟\n• 散步、快走即可\n\n**监测：**\n• 定期测血糖\n• 随身带**糖果饼干**，防低血糖\n\n> 我是科普助手，不能代替医生，不舒服请及时就医。';
     }
     if (t.includes('保健品') && t.includes('药品')) {
-      return '💊 **保健品不能代替药品！**\n\n• 保健品是**食品**，不是药品\n• 保健品**不能治病**\n• 身体不舒服要去**正规医院**\n• 买药要去**正规药店**\n\n记住：**"包治百病"的都是骗人的！**';
+      return '**保健品不能代替药品！**\n\n• 保健品是**食品**，不是药品\n• 保健品**不能治病**\n• 身体不舒服要去**正规医院**\n• 买药要去**正规药店**\n\n记住：**"包治百病"的都是骗人的！**';
     }
     if (t.includes('体检') || t.includes('检查')) {
-      return '🏥 **老年人每年建议检查项目：**\n\n**①** 血压测量\n**②** 血糖检测\n**③** 血脂检查\n**④** 心电图\n**⑤** 视力/听力检查\n\n建议每年至少体检一次，到乡镇卫生院或村卫生室即可。';
+      return '**老年人每年建议检查项目：**\n\n**1.** 血压测量\n**2.** 血糖检测\n**3.** 血脂检查\n**4.** 心电图\n**5.** 视力/听力检查\n\n建议每年至少体检一次，到乡镇卫生院或村卫生室即可。';
     }
 
     // 养老政策类
     if (t.includes('养老金') && (t.includes('条件') || t.includes('怎么领') || t.includes('领取'))) {
-      return '💰 **养老金领取条件：**\n\n• 年满 **60周岁**\n• 累计缴费满 **15年**\n• 男女退休年龄均为60岁\n\n**办理流程：**\n提前1-3个月到户籍地社保机构申请\n\n> 📞 社保热线：**12333**';
+      return '**养老金领取条件：**\n\n• 年满 **60周岁**\n• 累计缴费满 **15年**\n• 男女退休年龄均为60岁\n\n**办理流程：**\n提前1-3个月到户籍地社保机构申请\n\n> 社保热线：**12333**';
     }
     if (t.includes('养老金') && (t.includes('多少钱') || t.includes('标准') || t.includes('每月'))) {
-      return '📊 **2026年养老金标准：**\n\n**全国最低标准：163元/月**\n• 广东省：约 **240元/月**\n• 深圳市：更高标准\n\n**养老金 = 基础养老金 + 个人账户养老金**\n多缴多得，长缴多得。\n\n65岁以上老人还有额外高龄补贴。';
+      return '**2026年养老金标准：**\n\n**全国最低标准：163元/月**\n• 广东省：约 **240元/月**\n• 深圳市：更高标准\n\n**养老金 = 基础养老金 + 个人账户养老金**\n多缴多得，长缴多得。\n\n65岁以上老人还有额外高龄补贴。';
     }
     if (t.includes('高龄补贴')) {
-      return '🎁 **高龄补贴政策（各地不同）：**\n\n一般 **70岁以上** 开始发放：\n• 70-79岁：各地标准不等\n• 80-89岁：每月30-60元\n• 90-99岁：每月50-150元\n• 100岁以上：每月最高1000元\n\n> 📞 详情咨询：**12333** 社保热线';
+      return '**高龄补贴政策（各地不同）：**\n\n一般 **70岁以上** 开始发放：\n• 70-79岁：各地标准不等\n• 80-89岁：每月30-60元\n• 90-99岁：每月50-150元\n• 100岁以上：每月最高1000元\n\n> 详情咨询：**12333** 社保热线';
     }
     if (t.includes('社保卡') && (t.includes('丢') || t.includes('挂失') || t.includes('补办'))) {
-      return '💳 **社保卡丢失怎么办？**\n\n**① 立即挂失：** 拨打 **12333** 口头挂失\n**② 正式补办：** 带身份证到社保局或银行网点办理\n**③ 激活：** 新卡需到银行激活金融功能\n\n> 📌 社保卡兼具医保和金融功能，丢失后请尽快挂失！';
+      return '**社保卡丢失怎么办？**\n\n**1. 立即挂失：** 拨打 **12333** 口头挂失\n**2. 正式补办：** 带身份证到社保局或银行网点办理\n**3. 激活：** 新卡需到银行激活金融功能\n\n> 社保卡兼具医保和金融功能，丢失后请尽快挂失！';
     }
 
     // 默认回复
@@ -1655,7 +1694,7 @@
     if (mode === 'elderly') {
       return '好的，已收到您的问题。\n\n您可以尝试问我：\n• "有人打电话说我中奖了是诈骗吗？"\n• "高血压平时要注意什么？"\n• "养老金怎么领？"';
     }
-    return '您好！我是惠家通，您的乡村家庭智能服务助手。\n\n请选择右上角的身份，或直接问我：\n📚 **资助政策** — 助学贷款、助学金等\n🛡️ **防诈骗** — 识别诈骗电话\n🏥 **健康科普** — 高血压、糖尿病\n👴 **养老政策** — 养老金、高龄补贴';
+    return '您好！我是惠家通，您的乡村家庭智能服务助手。\n\n请选择右上角的身份，或直接问我：\n**资助政策** — 助学贷款、助学金等\n**防诈骗** — 识别诈骗电话\n**健康科普** — 高血压、糖尿病\n**养老政策** — 养老金、高龄补贴';
   }
 
   // ===== 添加消息 =====
@@ -1670,7 +1709,7 @@
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar ' + role;
-    avatar.textContent = role === 'agent' ? '�' : '�';
+    avatar.textContent = role === 'agent' ? '惠' : '我';
 
     const content = document.createElement('div');
     content.className = 'message-content';
@@ -1691,7 +1730,7 @@
 
       const actions = document.createElement('div');
       actions.className = 'message-actions';
-      actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">🔊 重听</button><button class="action-btn" onclick="forwardMsg(this)">↗️ 转发</button>';
+      actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">重听</button><button class="action-btn" onclick="forwardMsg(this)">转发</button>';
       content.appendChild(actions);
     }
 
@@ -1707,7 +1746,7 @@
     const row = document.createElement('div');
     row.className = 'message-row';
     row.id = 'loadingRow';
-    row.innerHTML = '<div class="avatar agent">�</div><div class="message-content"><div class="bubble agent"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
+    row.innerHTML = '<div class="avatar agent">惠</div><div class="message-content"><div class="bubble agent"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
     conv.appendChild(row);
     conv.scrollTop = conv.scrollHeight;
   }
@@ -1929,48 +1968,35 @@
       recognition.start();
       document.getElementById('micBtn').classList.add('recording');
       isRecording = true;
-      showToast('🎤 正在录音，请说话...');
+      showToast('录音中，请说话...');
     }
   }
 
-  // ===== FAQ =====
   // ===== 悬浮按钮自动隐藏 =====
-  let fabHideTimer = null;
+  let scrollTimer = null;
   function showFabs() {
     const fabs = document.querySelectorAll('.api-fab, .faq-fab');
     fabs.forEach(el => el.classList.remove('hidden'));
-    clearTimeout(fabHideTimer);
-    // 2 秒后自动半隐（保留可点击）
-    fabHideTimer = setTimeout(() => {
-      // 一直保持半透明状态即可，无需完全隐藏
-    }, 2000);
   }
-  function hideFabs() {
-    const fabs = document.querySelectorAll('.api-fab, .faq-fab');
-    fabs.forEach(el => el.classList.add('hidden'));
-    clearTimeout(fabHideTimer);
-    fabHideTimer = setTimeout(showFabs, 2500);
-  }
-  // 滚动时隐藏，停止后 2.5 秒重新出现
-  let scrollTimer = null;
-  document.addEventListener('scroll', function() {
+  function hideFabsTemp() {
     const fabs = document.querySelectorAll('.api-fab, .faq-fab');
     fabs.forEach(el => el.classList.add('hidden'));
     clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-      fabs.forEach(el => el.classList.remove('hidden'));
-    }, 800);
-  }, { passive: true });
+    scrollTimer = setTimeout(showFabs, 1500);
+  }
+  // 对话区滚动时隐藏，停止后 1.5 秒重新出现
+  const convEl = document.getElementById('conversation');
+  if (convEl) {
+    convEl.addEventListener('scroll', function() {
+      hideFabsTemp();
+    }, { passive: true });
+  }
   // 输入时隐藏
   document.addEventListener('input', function() {
-    const fabs = document.querySelectorAll('.api-fab, .faq-fab');
-    fabs.forEach(el => el.classList.add('hidden'));
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-      fabs.forEach(el => el.classList.remove('hidden'));
-    }, 1500);
+    hideFabsTemp();
   });
 
+  // ===== FAQ =====
   function toggleFAQ() {
     document.getElementById('faqModal').classList.toggle('show');
   }
@@ -2031,7 +2057,7 @@
       keyInput.style.display = 'block';
       // 如果备选平台和主平台相同，提示
       if (sel.value === selectedPlatform) {
-        keyInput.placeholder = '⚠️ 备选平台不应与主平台相同';
+        keyInput.placeholder = '备选平台不应与主平台相同';
       } else {
         keyInput.placeholder = PLATFORMS[sel.value].name + ' API Key';
       }
@@ -2120,7 +2146,7 @@
       localStorage.removeItem('llm_backup_key');
     }
 
-    let msg = '✅ 已配置 ' + (config?.name || '自定义');
+    let msg = '已配置 ' + (config?.name || '自定义');
     if (backupPlatform) {
       msg += ' + 备选 ' + PLATFORMS[backupPlatform].name;
     }
@@ -2155,14 +2181,14 @@
       const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
       const name = PLATFORMS[platform]?.name || platform;
       const backupPlatform = localStorage.getItem('llm_backup_platform');
-      let html = '✅ 主：<b>' + name + '</b>（' + model + '）';
+      let html = '主：<b>' + name + '</b>（' + model + '）';
       if (backupPlatform) {
-        html += '<br>🔄 备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
+        html += '<br>备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
       }
       statusEl.innerHTML = html;
       statusEl.style.color = '#4CAF50';
     } else {
-      statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
+      statusEl.textContent = '未配置，使用本地模拟回复';
       statusEl.style.color = '#FF9800';
     }
   }
