@@ -189,14 +189,12 @@
     /* ===== 对话区 ===== */
     .conversation {
       flex: 1;
-      padding: 18px 12px 18px 16px;
+      padding: 18px 12px 40px 16px;
       overflow-y: auto;
       overflow-x: hidden;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      min-height: 400px;
-      max-height: calc(100vh - 200px);
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
     }
@@ -375,6 +373,9 @@
       cursor: pointer;
       transition: all 0.25s;
       box-shadow: 0 2px 8px rgba(74,144,217,0.06);
+      overflow: visible;
+      position: relative;
+      flex-shrink: 0;
     }
     .story-card:hover {
       transform: translateY(-2px);
@@ -676,7 +677,7 @@
     /* ===== FAQ 悬浮按钮 ===== */
     .faq-fab {
       position: fixed;
-      bottom: 180px;
+      bottom: 140px;
       right: max(calc(50vw - 260px + 16px), 16px);
       width: 48px; height: 48px;
       border: none;
@@ -702,7 +703,7 @@
     /* ===== API 设置悬浮按钮 ===== */
     .api-fab {
       position: fixed;
-      bottom: 240px;
+      bottom: 200px;
       right: max(calc(50vw - 260px + 16px), 16px);
       width: 48px; height: 48px;
       border: 2px solid #E8743C;
@@ -861,7 +862,8 @@
     /* ===== 响应式 ===== */
     @media (max-width: 520px) {
       .header { border-radius: 0; }
-      .faq-fab { right: 16px; bottom: 170px; }
+      .faq-fab { right: 16px; bottom: 140px; }
+      .api-fab { right: 16px; bottom: 200px; }
       .bubble { font-size: 15px; }
     }
     @media (min-width: 521px) {
@@ -1082,23 +1084,23 @@
     <!-- 平台选择 -->
     <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">选择平台</label>
     <div id="platformOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
-      <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;">
-        <div style="font-size:18px;font-weight:800;color:#E8743C;">豆</div>
+      <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🔥</div>
         <div style="font-size:13px;font-weight:600;color:#333;">豆包</div>
         <div style="font-size:11px;color:#888;">50万+200万/天</div>
       </div>
-      <div onclick="selectPlatform('zhipu')" data-platform="zhipu" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:18px;font-weight:800;color:#4CAF50;">智</div>
+      <div onclick="selectPlatform('zhipu')" data-platform="zhipu" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🧠</div>
         <div style="font-size:13px;font-weight:600;color:#333;">智谱AI</div>
         <div style="font-size:11px;color:#4CAF50;">免费不限量</div>
       </div>
-      <div onclick="selectPlatform('siliconflow')" data-platform="siliconflow" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:18px;font-weight:800;color:#9C27B0;">硅</div>
+      <div onclick="selectPlatform('siliconflow')" data-platform="siliconflow" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">⚡</div>
         <div style="font-size:13px;font-weight:600;color:#333;">硅基流动</div>
         <div style="font-size:11px;color:#888;">2000万Token</div>
       </div>
-      <div onclick="selectPlatform('custom')" data-platform="custom" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;">
-        <div style="font-size:18px;font-weight:800;color:#607D8B;">自</div>
+      <div onclick="selectPlatform('custom')" data-platform="custom" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🔧</div>
         <div style="font-size:13px;font-weight:600;color:#333;">自定义</div>
         <div style="font-size:11px;color:#888;">OpenAI兼容</div>
       </div>
@@ -1281,25 +1283,25 @@
       name: '豆包（火山引擎）',
       apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
       defaultModel: 'doubao-3-5-32k-250428',
-      tip: '<b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
+      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
     },
     zhipu: {
       name: '智谱AI（GLM）',
       apiUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
       defaultModel: 'glm-4-flash',
-      tip: '<b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
+      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
     },
     siliconflow: {
       name: '硅基流动',
       apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
       defaultModel: 'deepseek-ai/DeepSeek-V3',
-      tip: '<b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
+      tip: '⚡ <b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
     },
     custom: {
       name: '自定义平台',
       apiUrl: '',
       defaultModel: '',
-      tip: '<b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
+      tip: '🔧 <b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
     }
   };
 
@@ -1647,44 +1649,44 @@
 
     // 防诈骗类
     if (t.includes('中奖') && (t.includes('电话') || t.includes('诈骗'))) {
-      return '**重要提醒：这是诈骗！**\n\n**特征分析：**\n× 声称中奖 — 正规中奖不需要提前交钱\n× 要求交手续费 — 典型骗局\n\n**正确做法：**\n• 不要转账，不提供验证码\n• 挂断电话，不要回拨\n• 联系村干部或拨打 **110**\n\n> 记住：**凡是让您先交钱才能领奖的，都是诈骗！**';
+      return '⚠️ **重要提醒：这是诈骗！**\n\n**特征分析：**\n❌ 声称中奖 — 正规中奖不需要提前交钱\n❌ 要求交手续费 — 典型骗局\n\n✅ **正确做法：**\n• 不要转账，不提供验证码\n• 挂断电话，不要回拨\n• 联系村干部或拨打 **110**\n\n> 📌 记住：**凡是让您先交钱才能领奖的，都是诈骗！**';
     }
     if (t.includes('冒充') && (t.includes('警察') || t.includes('公检法'))) {
-      return '**重要提醒：这是冒充公检法诈骗！**\n\n**套路分析：**\n× 骗子冒充警察/法官，说您涉嫌犯罪\n× 要求您转账到"安全账户"验证资金\n\n**正确做法：**\n• **挂断电话**，公安机关不会电话办案\n• **不要转账**，没有"安全账户"这回事\n• 拨打 **110** 核实\n\n> 公检法机关不会通过电话要求转账！';
+      return '⚠️ **重要提醒：这是冒充公检法诈骗！**\n\n**套路分析：**\n❌ 骗子冒充警察/法官，说您涉嫌犯罪\n❌ 要求您转账到"安全账户"验证资金\n\n✅ **正确做法：**\n• **挂断电话**，公安机关不会电话办案\n• **不要转账**，没有"安全账户"这回事\n• 拨打 **110** 核实\n\n> 📌 公检法机关不会通过电话要求转账！';
     }
     if (t.includes('保健品诈骗') || (t.includes('保健品') && t.includes('诈骗'))) {
-      return '**保健品诈骗常见套路：**\n\n**1. 免费诱饵：** 免费体检、免费讲座、免费领鸡蛋\n**2. 情感陪护：** 亲切喊"爸妈"，关心您的身体\n**3. 夸大病情：** 说您身体有大问题，制造恐慌\n**4. 高价推销：** 卖出比成本高几十倍的"保健品"\n\n**防骗要点：**\n• 保健品**不能治病**\n• 认准"蓝帽子"标志\n• 买药去正规药店\n• 不舒服要去正规医院';
+      return '⚠️ **保健品诈骗常见套路：**\n\n**1. 免费诱饵：** 免费体检、免费讲座、免费领鸡蛋\n**2. 情感陪护：** 亲切喊"爸妈"，关心您的身体\n**3. 夸大病情：** 说您身体有大问题，制造恐慌\n**4. 高价推销：** 卖出比成本高几十倍的"保健品"\n\n✅ **防骗要点：**\n• 保健品**不能治病**\n• 认准"蓝帽子"标志\n• 买药去正规药店\n• 不舒服要去正规医院';
     }
     if (t.includes('遇到诈骗') || (t.includes('诈骗') && t.includes('怎么办'))) {
-      return '**遇到诈骗怎么办？**\n\n**四步处理：**\n**1. 停止** — 立刻停止操作，不要转账\n**2. 挂断** — 挂断电话，不要回拨\n**3. 联系** — 联系子女/村干部/拨打 **110**\n**4. 报警** — 保存证据，立即报警\n\n**重要电话：**\n• 报警：**110**\n• 反诈专线：**96110**\n• 国家反诈中心APP：开启来电预警';
+      return '🚨 **遇到诈骗怎么办？**\n\n**四步处理：**\n**1. 停止** — 立刻停止操作，不要转账\n**2. 挂断** — 挂断电话，不要回拨\n**3. 联系** — 联系子女/村干部/拨打 **110**\n**4. 报警** — 保存证据，立即报警\n\n📞 **重要电话：**\n• 报警：**110**\n• 反诈专线：**96110**\n• 国家反诈中心APP：开启来电预警';
     }
 
     // 健康科普类
     if (t.includes('高血压') || t.includes('血压高')) {
-      return '**高血压日常注意事项：**\n\n**饮食：**\n• 少吃盐，每天不超过 **5克**（一啤酒瓶盖）\n• 多吃蔬菜水果，少吃肥肉\n\n**运动：**\n• 每天散步 **30分钟**\n• 控制体重\n\n**用药：**\n• **按时吃药**，不要自己停药\n• 坐姿站起时动作要慢\n\n> 我是科普助手，不能代替医生，不舒服请及时就医。';
+      return '❤️ **高血压日常注意事项：**\n\n🥗 **饮食：**\n• 少吃盐，每天不超过 **5克**（一啤酒瓶盖）\n• 多吃蔬菜水果，少吃肥肉\n\n🏃 **运动：**\n• 每天散步 **30分钟**\n• 控制体重\n\n💊 **用药：**\n• **按时吃药**，不要自己停药\n• 坐姿站起时动作要慢\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
     }
     if (t.includes('糖尿病')) {
-      return '**糖尿病日常注意事项：**\n\n**饮食：**\n• 少糖少油少盐\n• 每餐米饭不超过一碗\n• 水果选低糖的\n\n**运动：**\n• 每周运动5-7次，每次30-60分钟\n• 散步、快走即可\n\n**监测：**\n• 定期测血糖\n• 随身带**糖果饼干**，防低血糖\n\n> 我是科普助手，不能代替医生，不舒服请及时就医。';
+      return '🩸 **糖尿病日常注意事项：**\n\n🥗 **饮食：**\n• 少糖少油少盐\n• 每餐米饭不超过一碗\n• 水果选低糖的\n\n🏃 **运动：**\n• 每周运动5-7次，每次30-60分钟\n• 散步、快走即可\n\n💊 **监测：**\n• 定期测血糖\n• 随身带**糖果饼干**，防低血糖\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
     }
     if (t.includes('保健品') && t.includes('药品')) {
-      return '**保健品不能代替药品！**\n\n• 保健品是**食品**，不是药品\n• 保健品**不能治病**\n• 身体不舒服要去**正规医院**\n• 买药要去**正规药店**\n\n记住：**"包治百病"的都是骗人的！**';
+      return '💊 **保健品不能代替药品！**\n\n• 保健品是**食品**，不是药品\n• 保健品**不能治病**\n• 身体不舒服要去**正规医院**\n• 买药要去**正规药店**\n\n记住：**"包治百病"的都是骗人的！**';
     }
     if (t.includes('体检') || t.includes('检查')) {
-      return '**老年人每年建议检查项目：**\n\n**1.** 血压测量\n**2.** 血糖检测\n**3.** 血脂检查\n**4.** 心电图\n**5.** 视力/听力检查\n\n建议每年至少体检一次，到乡镇卫生院或村卫生室即可。';
+      return '🏥 **老年人每年建议检查项目：**\n\n**1.** 血压测量\n**2.** 血糖检测\n**3.** 血脂检查\n**4.** 心电图\n**5.** 视力/听力检查\n\n建议每年至少体检一次，到乡镇卫生院或村卫生室即可。';
     }
 
     // 养老政策类
     if (t.includes('养老金') && (t.includes('条件') || t.includes('怎么领') || t.includes('领取'))) {
-      return '**养老金领取条件：**\n\n• 年满 **60周岁**\n• 累计缴费满 **15年**\n• 男女退休年龄均为60岁\n\n**办理流程：**\n提前1-3个月到户籍地社保机构申请\n\n> 社保热线：**12333**';
+      return '💰 **养老金领取条件：**\n\n• 年满 **60周岁**\n• 累计缴费满 **15年**\n• 男女退休年龄均为60岁\n\n**办理流程：**\n提前1-3个月到户籍地社保机构申请\n\n> 📞 社保热线：**12333**';
     }
     if (t.includes('养老金') && (t.includes('多少钱') || t.includes('标准') || t.includes('每月'))) {
-      return '**2026年养老金标准：**\n\n**全国最低标准：163元/月**\n• 广东省：约 **240元/月**\n• 深圳市：更高标准\n\n**养老金 = 基础养老金 + 个人账户养老金**\n多缴多得，长缴多得。\n\n65岁以上老人还有额外高龄补贴。';
+      return '📊 **2026年养老金标准：**\n\n**全国最低标准：163元/月**\n• 广东省：约 **240元/月**\n• 深圳市：更高标准\n\n**养老金 = 基础养老金 + 个人账户养老金**\n多缴多得，长缴多得。\n\n65岁以上老人还有额外高龄补贴。';
     }
     if (t.includes('高龄补贴')) {
-      return '**高龄补贴政策（各地不同）：**\n\n一般 **70岁以上** 开始发放：\n• 70-79岁：各地标准不等\n• 80-89岁：每月30-60元\n• 90-99岁：每月50-150元\n• 100岁以上：每月最高1000元\n\n> 详情咨询：**12333** 社保热线';
+      return '🎁 **高龄补贴政策（各地不同）：**\n\n一般 **70岁以上** 开始发放：\n• 70-79岁：各地标准不等\n• 80-89岁：每月30-60元\n• 90-99岁：每月50-150元\n• 100岁以上：每月最高1000元\n\n> 📞 详情咨询：**12333** 社保热线';
     }
     if (t.includes('社保卡') && (t.includes('丢') || t.includes('挂失') || t.includes('补办'))) {
-      return '**社保卡丢失怎么办？**\n\n**1. 立即挂失：** 拨打 **12333** 口头挂失\n**2. 正式补办：** 带身份证到社保局或银行网点办理\n**3. 激活：** 新卡需到银行激活金融功能\n\n> 社保卡兼具医保和金融功能，丢失后请尽快挂失！';
+      return '💳 **社保卡丢失怎么办？**\n\n**1. 立即挂失：** 拨打 **12333** 口头挂失\n**2. 正式补办：** 带身份证到社保局或银行网点办理\n**3. 激活：** 新卡需到银行激活金融功能\n\n> 📌 社保卡兼具医保和金融功能，丢失后请尽快挂失！';
     }
 
     // 默认回复
@@ -1694,7 +1696,7 @@
     if (mode === 'elderly') {
       return '好的，已收到您的问题。\n\n您可以尝试问我：\n• "有人打电话说我中奖了是诈骗吗？"\n• "高血压平时要注意什么？"\n• "养老金怎么领？"';
     }
-    return '您好！我是惠家通，您的乡村家庭智能服务助手。\n\n请选择右上角的身份，或直接问我：\n**资助政策** — 助学贷款、助学金等\n**防诈骗** — 识别诈骗电话\n**健康科普** — 高血压、糖尿病\n**养老政策** — 养老金、高龄补贴';
+    return '您好！我是惠家通，您的乡村家庭智能服务助手。\n\n请选择右上角的身份，或直接问我：\n📚 **资助政策** — 助学贷款、助学金等\n🛡️ **防诈骗** — 识别诈骗电话\n🏥 **健康科普** — 高血压、糖尿病\n👴 **养老政策** — 养老金、高龄补贴';
   }
 
   // ===== 添加消息 =====
@@ -1730,7 +1732,7 @@
 
       const actions = document.createElement('div');
       actions.className = 'message-actions';
-      actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">重听</button><button class="action-btn" onclick="forwardMsg(this)">转发</button>';
+      actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">🔊 重听</button><button class="action-btn" onclick="forwardMsg(this)">↗ 转发</button>';
       content.appendChild(actions);
     }
 
@@ -2146,7 +2148,7 @@
       localStorage.removeItem('llm_backup_key');
     }
 
-    let msg = '已配置 ' + (config?.name || '自定义');
+    let msg = '✅ 已配置 ' + (config?.name || '自定义');
     if (backupPlatform) {
       msg += ' + 备选 ' + PLATFORMS[backupPlatform].name;
     }
@@ -2181,14 +2183,14 @@
       const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
       const name = PLATFORMS[platform]?.name || platform;
       const backupPlatform = localStorage.getItem('llm_backup_platform');
-      let html = '主：<b>' + name + '</b>（' + model + '）';
+      let html = '✅ 主：<b>' + name + '</b>（' + model + '）';
       if (backupPlatform) {
-        html += '<br>备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
+        html += '<br>🔄 备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
       }
       statusEl.innerHTML = html;
       statusEl.style.color = '#4CAF50';
     } else {
-      statusEl.textContent = '未配置，使用本地模拟回复';
+      statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
       statusEl.style.color = '#FF9800';
     }
   }
