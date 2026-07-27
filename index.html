@@ -818,7 +818,8 @@
   </div>
 </div>
 
-<!-- ===== FAQ 按钮 ===== -->
+<!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
+<button class="api-fab" onclick="toggleAPISettings()" title="API 设置" style="position:fixed;right:20px;bottom:220px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid #F5A623;color:#F5A623;font-size:22px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:200;transition:all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">⚙️</button>
 <button class="faq-fab" onclick="toggleFAQ()" title="常见问题">❓</button>
 
 <!-- ===== FAQ 弹窗 ===== -->
@@ -880,6 +881,27 @@
         <div class="faq-item" onclick="askFAQ('社保卡丢了怎么办？')">💳 社保卡挂失补办</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ===== API 配置弹窗 ===== -->
+<div class="api-modal" id="apiModal" onclick="if(event.target===this)toggleAPISettings()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:20px;color:#333;">⚙️ API 设置</h3>
+      <button onclick="toggleAPISettings()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">✕</button>
+    </div>
+    <p style="font-size:14px;color:#666;margin-bottom:12px;">配置豆包大模型 API，获得更准确的回答。不配置则使用本地模拟回复。</p>
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">豆包 API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="输入 API Key" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;margin-bottom:12px;box-sizing:border-box;">
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">模型 ID（可选）</label>
+    <input type="text" id="modelInput" placeholder="doubao-3-5-32k-250428" style="width:100%;padding:12px;border:2px solid #F5A623;border-radius:8px;font-size:16px;margin-bottom:16px;box-sizing:border-box;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveAPISettings()" style="flex:1;padding:12px;background:#F5A623;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">保存</button>
+      <button onclick="clearAPISettings()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:16px;cursor:pointer;">清除</button>
+    </div>
+    <p id="apiStatus" style="font-size:13px;color:#888;margin-top:12px;text-align:center;"></p>
+    <p style="font-size:12px;color:#aaa;margin-top:8px;">获取 API Key：火山引擎控制台 → 方舟 → API Key</p>
   </div>
 </div>
 
@@ -1013,49 +1035,182 @@
     }
   }
 
+  // ===== 豆包大模型 API 配置 =====
+  const DOUBAO_API_URL = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
+  const DOUBAO_MODEL = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
+
+  // ===== 知识库内容（嵌入前端，作为 system prompt 上下文） =====
+  const KB_FUNDING = `【资助政策库】
+一、国家助学贷款
+- 本专科生最高20000元/年，研究生最高25000元/年（以当年官方政策为准）
+- 贷款期限：学制+15年，最长22年
+- 利率：LPR5Y-70个基点（约2.8%），每年调整
+- 贴息：在校期间国家全额贴息，毕业后5年还本宽限期（只还利息），第6年起还本息
+- 申请时间：每年7月15日-9月30日
+- 申请渠道：国家开发银行学生在线系统 sls.cdb.com.cn 或国家助学贷款APP
+- 所需材料：录取通知书/学生证、身份证、户口本、共同借款人身份证
+- 共同借款人：原则上为父母，年龄25-60周岁，户籍须与学生在同一县
+- 还款方式：平安口袋银行APP、银联云闪付APP
+- 生源地贷款在县教育局办，校园地贷款在学校办
+
+二、国家助学金
+- 平均3300元/年，分档发放（2300/3300/4500元三档）
+- 申请时间：每年9-10月入学后向学校申请
+- 须通过家庭经济困难学生认定
+- 按月发放
+
+三、国家奖学金/励志奖学金
+- 国家奖学金：本科生8000元/年，研究生硕士20000元/年、博士30000元/年
+- 国家励志奖学金：5000元/年，奖励品学兼优的家庭经济困难学生
+- 申请时间：每年9-10月
+
+四、绿色通道
+- 高校为家庭经济困难新生设立的"先报到后缴费"通道
+- 确保不因学费问题失学
+
+五、勤工助学
+- 校内工作岗位，每月约300-800元
+- 不影响学习时间
+
+六、义务教育阶段
+- 两免一补：免学杂费、免课本费、补助寄宿生生活费
+- 家庭经济困难学生生活费补助
+- 农村义务教育学生营养改善计划
+- 开学后30日内向学校申请`;
+
+  const KB_ELDERLY = `【银龄关怀库】
+一、防诈骗指南
+- 常见诈骗类型：中奖诈骗、冒充公检法、保健品诈骗、养老投资骗局、冒充亲属、冒充客服
+- 诈骗特征：要求转账、索要验证码、声称中奖需交手续费、要求转到"安全账户"、冒充公检法
+- 防骗"五要"原则：要看资质、要抵诱惑、要拒代办、要拒保健品、要多沟通
+- 遇到诈骗：挂断电话→联系子女/村干部→拨打110
+- 反诈专线：96110
+
+二、健康科普
+- 高血压：每天盐不超过5克、每天散步30分钟、按时吃药不要自己停药、定期测血压
+- 糖尿病：少糖少油、每餐米饭不超一碗、定期测血糖、随身带糖果防低血糖
+- 保健品不能代替药品，不舒服要去正规医院
+
+三、养老政策
+- 养老金领取条件：年满60周岁、累计缴费满15年
+- 2026年全国基础养老金最低标准：163元/月
+- 广东省基础养老金标准：约240元/月
+- 高龄津贴：一般70岁以上开始发放，分四档
+- 社保咨询热线：12333
+- 社保卡丢失：拨打12333挂失，带身份证到社保局补办`;
+
   // ===== Agent API 调用 =====
   async function getAgentReply(text, mode) {
-    // 尝试多个可能的 Trae API 端点
+    // 1. 优先尝试豆包大模型 API
+    const apiKey = localStorage.getItem('doubao_api_key');
+    if (apiKey) {
+      try {
+        const reply = await callDoubaoAPI(text, mode, apiKey);
+        return reply;
+      } catch (e) {
+        console.warn('豆包API调用失败，回退到本地回复:', e);
+      }
+    }
+
+    // 2. 尝试本地后端 API（如果部署了后端服务）
     const apiUrls = [
       '/api/chat',
-      '/api/trae/chat',
       'http://localhost:8080/api/chat',
-      'http://localhost:3000/api/chat',
       'http://127.0.0.1:8080/api/chat'
     ];
-    const payload = {
-      message: text,
-      mode: mode,
-      user_id: 'web-user'
-    };
     for (const url of apiUrls) {
       try {
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ message: text, mode: mode, user_id: 'web-user' })
         });
         if (res.ok) {
           const data = await res.json();
-          return data.reply || data.message || data.response || '好的，已收到您的问题。';
+          return data.reply || data.message || data.response;
         }
-      } catch (e) {
-        // 继续尝试下一个端点
-      }
+      } catch (e) {}
     }
-    // 所有 API 都不可用，使用本地 Trae CLI 接口（如果 Trae 本地运行）
-    try {
-      const res = await fetch('/__trae/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text, context: currentMode })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return data.reply || data.answer || data.text || '好的。';
-      }
-    } catch (e) {}
+
+    // 3. 回退到本地模拟回复
     return simulateReply(text, mode);
+  }
+
+  // ===== 豆包大模型 API 调用 =====
+  async function callDoubaoAPI(text, mode, apiKey) {
+    // 根据模式选择知识库和 system prompt
+    let systemPrompt = '';
+    let kbContent = '';
+
+    if (mode === 'funding') {
+      systemPrompt = `你是一个学生资助政策专家，名叫"惠家通"。当前模式：资助政策咨询。
+
+【行为规范】
+1. 始终基于知识库回答，不要编造政策
+2. 回答要通俗易懂，用"大白话"解释专业术语
+3. 涉及金额时标注"以当年官方政策为准"
+4. 涉及诈骗类问题，先警示再解答
+5. 不知道的问题引导用户联系学校资助中心或拨打010-66097980
+
+【输出格式】
+- 简洁明了，分点列出
+- 重要信息用**加粗**
+- 每段不超过3行
+- 语音回答时语速适中
+
+【常见问题处理】
+1. "能申请什么" → 先问清楚对方身份（初中/高中/大学/家长），再针对性回答
+2. "怎么申请" → 分步列出流程，注明所需材料
+3. "能拿多少钱" → 给出标准范围，标注"以当年政策为准"
+4. "条件自测" → 让用户输入家庭年收入、在读人数等信息，综合推荐`;
+      kbContent = KB_FUNDING;
+    } else if (mode === 'elderly') {
+      systemPrompt = `你是"惠家通"银龄关怀助手，专为农村老年人服务。当前模式：银龄关怀。
+
+【行为规范】
+1. 语气亲切温暖，像家人一样关心
+2. 涉及诈骗问题，先警示再解答
+3. 健康问题只做科普，不代替医生诊断，提醒就医
+4. 养老政策标注"以当地政策为准"
+5. 用词简单易懂，避免专业术语
+
+【输出格式】
+- 简洁明了，分点列出
+- 重要信息用**加粗**
+- 每段不超过3行
+- 语速偏慢，适合老年人`;
+      kbContent = KB_ELDERLY;
+    } else {
+      systemPrompt = `你是"惠家通"，一个乡村家庭智能服务Agent。你可以回答资助政策、防诈骗、健康科普、养老政策等问题。请根据用户问题判断属于哪个领域，给出专业、通俗的回答。重要信息用**加粗**，分点列出。`;
+      kbContent = KB_FUNDING + '\n\n' + KB_ELDERLY;
+    }
+
+    const payload = {
+      model: DOUBAO_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt + '\n\n【知识库】\n' + kbContent },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.3,
+      max_tokens: 2048
+    };
+
+    const res = await fetch(DOUBAO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error('API错误: ' + res.status + ' ' + err);
+    }
+
+    const data = await res.json();
+    return data.choices[0].message.content;
   }
 
   // ===== 模拟回复（API 不可用时备用） =====
@@ -1145,15 +1300,35 @@
 
         // 生成推荐建议
         let loanMsg = uniCnt > 0
-          ? '上大学的' + (uniCnt > 1 ? '孩子每人' : '孩子') + '最高可申请 **20000元/年**'
+          ? '**' + uniCnt + '个大学生**每人每年可贷最高 **20000元**，合计最高 **' + (uniCnt * 20000) + '元/年**'
           : '上大学后可申请，最高 **20000元/年**';
         let grantMsg = uniCnt > 0
-          ? '上大学的' + (uniCnt > 1 ? '孩子均可申请' : '孩子入学后可申请')
+          ? uniCnt + '个大学生入学后可申请，平均 **3300元/年/人**，合计约 **' + (uniCnt * 3300) + '元/年**'
           : '上大学后入学即可申请，平均 **3300元/年**';
+        let grantDetail = uniCnt > 0
+          ? '\n- 按月发放，9-10月向学校申请'
+          : '，按月发放';
         let subDetail = '';
-        if (uniCnt > 0) subDetail += ' • 读书期间国家全额贴息，毕业后5年宽限期\n• 申请时间：**7月15日-9月30日**，在县教育局办理（以当年官方政策为准）';
+        if (uniCnt > 0) subDetail += '\n- 读书期间国家全额贴息，毕业后5年还本宽限期\n- 申请时间：**7月15日-9月30日**，县教育局办理\n- 所需材料：录取通知书/学生证、身份证、户口本、共同借款人身份证';
 
-        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n**① 生源地信用助学贷款**\n' + loanMsg + '\n' + subDetail + '\n\n**② 国家助学金**\n' + grantMsg + '，平均 **3300元/年**，按月发放\n\n**③ 绿色通道**\n没带够学费可**先入学后缴费**\n\n**④ 勤工助学**\n校内岗位，每月约 **300-800元**\n\n> 📌 助学贷款和助学金可以同时申请，**7-9月**先办贷款，**9-10月**入学后再办助学金！\n\n需要我帮您列出详细的申请材料清单吗？';
+        // 义务教育阶段资助
+        let eduSection = '';
+        if (midCnt > 0 || priCnt > 0) {
+          let eduChildren = [];
+          if (midCnt > 0) eduChildren.push(midCnt + '个初中');
+          if (priCnt > 0) eduChildren.push(priCnt + '个小学');
+          eduSection = '\n\n**5️⃣ 义务教育阶段资助**\n- ' + eduChildren.join('和') + '的孩子可享受 **"两免一补"**（免学杂费、免课本费、补助寄宿生生活费）\n- 具体标准以当地政策为准';
+        }
+
+        // 预估金额表格
+        let totalLoan = uniCnt * 20000;
+        let totalGrant = uniCnt * 3300;
+        let totalWork = uniCnt * 300 * 12 + '~' + (uniCnt * 800 * 12);
+        let table = '\n\n### 预估年度资助总额\n\n| 项目 | 金额（以当年政策为准） |\n|:-----|:-----|\n| 助学贷款（' + uniCnt + '人） | 最高 ' + totalLoan + '元 |\n| 助学金（' + uniCnt + '人） | 约 ' + totalGrant + '元 |\n| 勤工助学（' + uniCnt + '人） | 约 ' + totalWork + '元 |\n| 义务教育补助 | 按当地标准 |';
+
+        let reminder = '\n\n> 💡 **关键提醒**：年收入' + income + '万供' + cnt + '个孩子读书，压力确实大。**7-9月**先办助学贷款，**9-10月**入学后办助学金，两个时间不冲突。\n\n需要我列出详细的**申请时间表和材料清单**吗？';
+
+        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n---\n\n### 推荐方案（按优先级排序）\n\n**1️⃣ 生源地信用助学贷款**（最优先）\n' + loanMsg + subDetail + '\n\n**2️⃣ 国家助学金**\n- ' + grantMsg + grantDetail + '\n\n**3️⃣ 绿色通道**\n- 大学生报到当天没带够学费，可**先入学后缴费**\n\n**4️⃣ 勤工助学**\n- ' + uniCnt + '个大学生可申请校内岗位，每月约 **300-800元/人**' + eduSection + table + reminder;
       }
       return '好的，我来帮您做条件自测！\n\n请告诉我以下信息：\n**①** 家庭年收入（万元）\n**②** 家里有几个孩子在上学\n**③** 最高学历阶段（初中/高中/大学/大专）\n**④** 是否有特殊困难（残疾/重病/低保等）\n\n您可以直接告诉我，比如："年收入3万，两个孩子，一个高中一个大学"';
     }
@@ -1386,6 +1561,57 @@
     el.textContent = msg;
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  // ===== API 设置 =====
+  function toggleAPISettings() {
+    const modal = document.getElementById('apiModal');
+    const isHidden = modal.style.display === 'none';
+    modal.style.display = isHidden ? 'flex' : 'none';
+    if (isHidden) {
+      // 加载已保存的配置
+      const savedKey = localStorage.getItem('doubao_api_key') || '';
+      const savedModel = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
+      document.getElementById('apiKeyInput').value = savedKey;
+      document.getElementById('modelInput').value = savedModel;
+      updateAPIStatus();
+    }
+  }
+
+  function saveAPISettings() {
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
+    const model = document.getElementById('modelInput').value.trim() || 'doubao-3-5-32k-250428';
+    if (!apiKey) {
+      showToast('请输入 API Key');
+      return;
+    }
+    localStorage.setItem('doubao_api_key', apiKey);
+    localStorage.setItem('doubao_model', model);
+    showToast('✅ API 配置已保存，现在回答将使用豆包大模型');
+    updateAPIStatus();
+    setTimeout(() => toggleAPISettings(), 1500);
+  }
+
+  function clearAPISettings() {
+    localStorage.removeItem('doubao_api_key');
+    localStorage.removeItem('doubao_model');
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('modelInput').value = 'doubao-3-5-32k-250428';
+    showToast('已清除 API 配置，将使用本地模拟回复');
+    updateAPIStatus();
+  }
+
+  function updateAPIStatus() {
+    const statusEl = document.getElementById('apiStatus');
+    const apiKey = localStorage.getItem('doubao_api_key');
+    if (apiKey) {
+      const model = localStorage.getItem('doubao_model') || 'doubao-3-5-32k-250428';
+      statusEl.textContent = '✅ 已配置（模型：' + model + '）';
+      statusEl.style.color = '#4CAF50';
+    } else {
+      statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
+      statusEl.style.color = '#FF9800';
+    }
   }
 </script>
 </body>
