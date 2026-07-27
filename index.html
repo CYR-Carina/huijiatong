@@ -6,6 +6,11 @@
   <title>惠家通 — 乡村家庭智能服务 Agent</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "PingFang SC", sans-serif;
       background:
@@ -150,37 +155,39 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #fff;
+      background: #FFFBF5;
       box-shadow: 0 0 40px rgba(0,0,0,0.06);
       position: relative;
       z-index: 1;
-      border-radius: 0 0 16px 16px;
-      overflow: hidden;
+      border-radius: 0 0 20px 20px;
+      overflow: visible;
     }
 
-    .container.funding-mode { border-top: 3px solid #E8743C; }
-    .container.elderly-mode { border-top: 3px solid #4A90D9; }
-    .container.general-mode { border-top: 3px solid #E8743C; }
+    .container.funding-mode { box-shadow: 0 0 40px rgba(232,116,60,0.08); }
+    .container.elderly-mode { box-shadow: 0 0 40px rgba(74,144,217,0.08); }
+    .container.general-mode { box-shadow: 0 0 40px rgba(232,116,60,0.08); }
 
     /* ===== 对话区 ===== */
     .conversation {
       flex: 1;
-      padding: 18px 16px;
+      padding: 18px 12px 18px 16px;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       gap: 14px;
       min-height: 400px;
       max-height: calc(100vh - 200px);
       scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
     }
-    .conversation::-webkit-scrollbar { width: 5px; }
+    .conversation::-webkit-scrollbar { width: 4px; }
     .conversation::-webkit-scrollbar-track { background: transparent; }
     .conversation::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #E8743C, #C85A28);
-      border-radius: 3px;
+      background: rgba(232,116,60,0.25);
+      border-radius: 2px;
     }
-    .conversation::-webkit-scrollbar-thumb:hover { background: #A84820; }
+    .conversation::-webkit-scrollbar-thumb:hover { background: rgba(232,116,60,0.5); }
 
     .message-row {
       display: flex;
@@ -445,8 +452,14 @@
       margin-top: 2px;
       display: block;
     }
-    .quick-actions.funding .quick-action { border-left: 3px solid #E8743C; }
-    .quick-actions.elderly .quick-action { border-left: 3px solid #4A90D9; }
+    .quick-actions.funding .quick-action::before {
+      background: linear-gradient(90deg, #E8743C, #FFCE99);
+      opacity: 0.8;
+    }
+    .quick-actions.elderly .quick-action::before {
+      background: linear-gradient(90deg, #4A90D9, #8ABCF0);
+      opacity: 0.8;
+    }
 
     /* ===== 模式切换动画 ===== */
     .mode-badge {
@@ -832,7 +845,7 @@
 <!-- ===== 顶栏 ===== -->
 <header class="header">
   <div class="header-left">
-    <div class="header-logo">🌾</div>
+    <div class="header-logo">�</div>
     <div class="header-title-group">
       <span class="header-title">惠家通</span>
       <span class="mode-badge" id="modeBadge">❓ 随便问问</span>
@@ -863,7 +876,7 @@
   <div class="conversation" id="conversation">
     <!-- 欢迎卡片 -->
     <div class="welcome-card" id="welcomeCard">
-      <div class="title">� 欢迎来到惠家通</div>
+      <div class="title">🏡 欢迎来到惠家通</div>
       <div class="desc">
         我是您的乡村家庭智能服务助手。<br>
         一个 Agent，服务全家——学生问资助，老人防诈骗，全家享便利。
@@ -879,7 +892,7 @@
     <!-- 三下乡故事 -->
     <div class="story-card" id="storyCard" onclick="toggleStory()">
       <div class="story-header">
-        <span class="story-title">🌾 从三下乡中来 — 项目背景故事</span>
+        <span class="story-title">� 从三下乡中来 — 项目背景故事</span>
         <span class="story-toggle" id="storyToggle">▾</span>
       </div>
       <div class="story-body" id="storyBody">
@@ -1657,7 +1670,7 @@
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar ' + role;
-    avatar.textContent = role === 'agent' ? '🌾' : '👨‍👩‍👧';
+    avatar.textContent = role === 'agent' ? '�' : '�';
 
     const content = document.createElement('div');
     content.className = 'message-content';
