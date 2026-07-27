@@ -1605,41 +1605,34 @@
   // ===== 语音控制 =====
   let currentUtter = null;
   let isSpeaking = false;
-  let voicesReady = false;
+  let keepAliveTimer = null;
 
-  // 移动端需要用户交互后才能使用 speechSynthesis，预先加载 voices
-  function initVoices() {
-    if (!('speechSynthesis' in window)) return;
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      voicesReady = true;
-    }
-  }
+  // 预加载 voices（Chrome 异步加载）
   if ('speechSynthesis' in window) {
-    initVoices();
+    window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = function() {
-      initVoices();
+      window.speechSynthesis.getVoices();
     };
-    // iOS/Android 首次触摸解锁语音
-    document.addEventListener('touchstart', function unlockSpeech() {
+  }
+
+  // Chrome 长文本 bug 修复：每 10 秒 resume 一次，防止自动暂停
+  function startKeepAlive() {
+    stopKeepAlive();
+    keepAliveTimer = setInterval(function() {
+      if (!isSpeaking) return;
       try {
-        const u = new SpeechSynthesisUtterance('');
-        u.volume = 0;
-        window.speechSynthesis.speak(u);
-        window.speechSynthesis.cancel();
+        // 仅在 paused 时 resume，避免打断正常播放
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
       } catch(e) {}
-      document.removeEventListener('touchstart', unlockSpeech);
-    }, { once: true });
-    // 桌面端点击解锁
-    document.addEventListener('click', function unlockSpeech() {
-      try {
-        const u = new SpeechSynthesisUtterance('');
-        u.volume = 0;
-        window.speechSynthesis.speak(u);
-        window.speechSynthesis.cancel();
-      } catch(e) {}
-      document.removeEventListener('click', unlockSpeech);
-    }, { once: true });
+    }, 10000);
+  }
+  function stopKeepAlive() {
+    if (keepAliveTimer) {
+      clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
   }
 
   function speakText(text) {
@@ -1647,37 +1640,68 @@
       showToast('当前浏览器不支持语音播放');
       return;
     }
-    // 停止当前朗读
-    window.speechSynthesis.cancel();
+    // 清理：先 cancel 并等待一帧，避免触发自身 onend
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+    stopKeepAlive();
     if (currentUtter) currentUtter = null;
-    const cleanText = text.replace(/\s+/g, ' ');
+
+    const cleanText = (text || '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) {
+      showToast('没有可朗读的内容');
+      return;
+    }
+
     const utter = new SpeechSynthesisUtterance(cleanText);
     utter.lang = 'zh-CN';
-    utter.rate = speechRate;
+    utter.rate = speechRate || 0.9;
     utter.volume = 1;
     utter.pitch = 1;
+
     // 优先选择中文女声
-    const voices = window.speechSynthesis.getVoices();
-    const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting/i.test(v.name))
+    const voices = window.speechSynthesis.getVoices() || [];
+    const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting|yaoyao|kangkang/i.test(v.name))
                  || voices.find(v => v.lang === 'zh-CN')
-                 || voices.find(v => v.lang.startsWith('zh'));
+                 || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
     if (zhVoice) utter.voice = zhVoice;
+
     currentUtter = utter;
     isSpeaking = true;
-    document.getElementById('stopBtn').style.display = 'flex';
+    const stopBtn = document.getElementById('stopBtn');
+    if (stopBtn) stopBtn.style.display = 'flex';
+
     utter.onend = function() {
       isSpeaking = false;
-      if (document.getElementById('stopBtn'))
-        document.getElementById('stopBtn').style.display = 'none';
+      stopKeepAlive();
+      const sb = document.getElementById('stopBtn');
+      if (sb) sb.style.display = 'none';
     };
     utter.onerror = function(e) {
       console.warn('语音播放错误:', e);
       isSpeaking = false;
-      const stopBtn = document.getElementById('stopBtn');
-      if (stopBtn) stopBtn.style.display = 'none';
+      stopKeepAlive();
+      const sb = document.getElementById('stopBtn');
+      if (sb) sb.style.display = 'none';
+      // 错误时给用户清晰提示
+      if (e && e.error === 'not-allowed') {
+        showToast('请点击页面任意位置后重试（浏览器需要授权语音）');
+      } else {
+        showToast('语音播放失败，请检查浏览器设置');
+      }
     };
-    // iOS 需要异步调用
-    setTimeout(() => window.speechSynthesis.speak(utter), 50);
+
+    // 真正发起播放（保持异步，兼容 iOS Safari）
+    setTimeout(function() {
+      try {
+        window.speechSynthesis.speak(utter);
+        startKeepAlive();
+      } catch(err) {
+        console.error('speak 调用异常:', err);
+        showToast('语音播放失败：' + (err.message || '未知错误'));
+        isSpeaking = false;
+        const sb = document.getElementById('stopBtn');
+        if (sb) sb.style.display = 'none';
+      }
+    }, 50);
   }
 
   function stopSpeech() {
