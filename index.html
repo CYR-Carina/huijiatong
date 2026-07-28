@@ -189,7 +189,7 @@
     /* ===== 对话区 ===== */
     .conversation {
       flex: 1;
-      padding: 18px 12px 40px 16px;
+      padding: 18px 12px 60px 16px;
       overflow-y: auto;
       overflow-x: hidden;
       display: flex;
@@ -305,64 +305,6 @@
       color: #666;
     }
 
-    /* ===== 欢迎卡片 ===== */
-    .welcome-card {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,245,235,0.85) 100%),
-        radial-gradient(circle at top right, rgba(232,116,60,0.12), transparent 60%);
-      border-radius: 20px;
-      padding: 22px 20px 18px;
-      margin-bottom: 10px;
-      border: 1px solid #FFD9B8;
-      box-shadow: 0 4px 16px rgba(232,116,60,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
-      position: relative;
-      overflow: hidden;
-    }
-    .welcome-card::before {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 120px; height: 120px;
-      background: radial-gradient(circle, rgba(232,116,60,0.1) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-    .welcome-card .title {
-      font-size: 19px;
-      font-weight: 800;
-      color: #A84820;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-      position: relative;
-    }
-    .welcome-card .desc {
-      font-size: 13px;
-      color: #5C5248;
-      line-height: 1.7;
-      position: relative;
-    }
-    .welcome-card .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 12px;
-      position: relative;
-    }
-    .welcome-card .tags span {
-      padding: 5px 11px;
-      background: linear-gradient(135deg, #fff, #FFF5EB);
-      border-radius: 14px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #C85A28;
-      border: 1px solid #FFCE99;
-      box-shadow: 0 1px 3px rgba(232,116,60,0.1);
-      transition: all 0.2s;
-    }
-    .welcome-card .tags span:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(232,116,60,0.2);
-    }
-
     /* ===== 三下乡故事 ===== */
     .story-card {
       background: linear-gradient(135deg, #F8FBFF 0%, #EEF5FF 100%);
@@ -413,6 +355,41 @@
     }
     .story-card .story-body.show { display: block; animation: fadeIn 0.3s; }
 
+    /* ===== 推荐问题 ===== */
+    .suggest-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+    .sq-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, #FFFBF5 0%, #FFF5EB 100%);
+      border: 1px solid #FFE0C0;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      color: #5C4A3A;
+    }
+    .sq-item:hover {
+      background: linear-gradient(135deg, #FFF5EB 0%, #FFE8D0 100%);
+      border-color: #E8743C;
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(232,116,60,0.12);
+    }
+    .sq-item:active {
+      transform: scale(0.98) translateX(2px);
+    }
+    .sq-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
     /* ===== 快捷操作卡片 ===== */
     .quick-actions {
       display: grid;
@@ -450,8 +427,7 @@
     .quick-action:hover::before { opacity: 1; }
     .quick-action:active { transform: scale(0.94); }
     .quick-action .qa-icon {
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 28px;
       display: inline-flex;
       width: 48px; height: 48px;
       background: linear-gradient(135deg, #FFF5EB, #FFE5D0);
@@ -460,7 +436,6 @@
       margin-bottom: 6px;
       box-shadow: 0 2px 6px rgba(232,116,60,0.12);
       transition: transform 0.3s;
-      color: #C85A28;
     }
     .quick-action:hover .qa-icon {
       transform: scale(1.1) rotate(-5deg);
@@ -910,18 +885,46 @@
 <!-- ===== 主体 ===== -->
 <div class="container">
   <div class="conversation" id="conversation">
-    <!-- 欢迎卡片 -->
-    <div class="welcome-card" id="welcomeCard">
-      <div class="title">♥ 欢迎来到惠家通</div>
-      <div class="desc">
-        我是您的乡村家庭智能服务助手。<br>
-        一个 Agent，服务全家——学生问资助，老人防诈骗，全家享便利。
-      </div>
-      <div class="tags">
-        <span>资助政策</span>
-        <span>防诈骗</span>
-        <span>健康科普</span>
-        <span>养老政策</span>
+    <!-- Agent 开局自我介绍 -->
+    <div class="msg-row">
+      <div class="avatar agent">惠</div>
+      <div class="message-content">
+        <div class="bubble agent">
+          <div style="font-size:16px;font-weight:700;color:#A84820;margin-bottom:8px;">👋 您好！我是惠家通</div>
+          <div style="margin-bottom:10px;line-height:1.7;">
+            我是专门服务乡村家庭的 AI 助手，一个人服务全家：<br>
+            📚 学生问资助政策 &nbsp;&nbsp; 🛡️ 老人识别诈骗<br>
+            🏥 全家问健康养生 &nbsp;&nbsp; 👴 长辈查养老政策
+          </div>
+          <div style="font-size:13px;color:#8B7355;margin-top:4px;">您可以直接点击下方问题试试，或者输入您想问的内容～</div>
+        </div>
+        <!-- 推荐问题 -->
+        <div class="suggest-questions">
+          <div class="sq-item" onclick="quickAsk('助学贷款能贷多少钱？怎么申请？')">
+            <span class="sq-icon">💰</span>
+            <span>助学贷款能贷多少钱？怎么申请？</span>
+          </div>
+          <div class="sq-item" onclick="quickAsk('有人打电话说我中奖了让交手续费，是诈骗吗？')">
+            <span class="sq-icon">🛡️</span>
+            <span>中奖让交手续费是诈骗吗？</span>
+          </div>
+          <div class="sq-item" onclick="quickAsk('高血压平时要注意什么？')">
+            <span class="sq-icon">❤️</span>
+            <span>高血压日常注意事项</span>
+          </div>
+          <div class="sq-item" onclick="quickAsk('养老金多少岁可以领？')">
+            <span class="sq-icon">👴</span>
+            <span>养老金多少岁可以领？</span>
+          </div>
+          <div class="sq-item" onclick="startSelfTest()">
+            <span class="sq-icon">📊</span>
+            <span>帮我看看能申请什么资助</span>
+          </div>
+        </div>
+        <div class="message-actions">
+          <button class="action-btn" onclick="replayMsg(this)">🔊 重听</button>
+          <button class="action-btn" onclick="forwardMsg(this)">↗ 转发</button>
+        </div>
       </div>
     </div>
 
@@ -944,36 +947,24 @@
     <!-- 快捷操作卡片 -->
     <div class="quick-actions general" id="quickActions">
       <div class="quick-action" onclick="quickAsk('助学贷款能贷多少钱？')">
-        <span class="qa-icon">￥</span>
+        <span class="qa-icon">💰</span>
         <span class="qa-label">助学贷款</span>
-        <span class="qa-desc">了解额度和申请条件</span>
+        <span class="qa-desc">了解额度和条件</span>
       </div>
       <div class="quick-action" onclick="quickAsk('有人打电话说我中奖了是诈骗吗？')">
-        <span class="qa-icon">!</span>
+        <span class="qa-icon">🛡️</span>
         <span class="qa-label">防诈骗</span>
         <span class="qa-desc">识别常见骗局</span>
       </div>
       <div class="quick-action" onclick="quickAsk('高血压平时要注意什么？')">
-        <span class="qa-icon">+</span>
+        <span class="qa-icon">❤️</span>
         <span class="qa-label">健康养生</span>
         <span class="qa-desc">慢病管理建议</span>
       </div>
       <div class="quick-action" onclick="quickAsk('养老金怎么领？')">
-        <span class="qa-icon">60</span>
+        <span class="qa-icon">👴</span>
         <span class="qa-label">养老政策</span>
-        <span class="qa-desc">养老金和医保查询</span>
-      </div>
-    </div>
-
-    <!-- 条件自测入口 -->
-    <div class="self-test-card" id="selfTestCard" onclick="startSelfTest()">
-      <div class="st-row">
-        <div class="st-icon">测</div>
-        <div>
-          <div class="st-title">条件自测</div>
-          <div class="st-desc">输入家庭情况，智能推荐适合您的资助项目</div>
-        </div>
-        <span class="st-arrow">→</span>
+        <span class="qa-desc">养老金和医保</span>
       </div>
     </div>
   </div>
@@ -1239,16 +1230,6 @@
 
     // 更新快捷操作
     updateQuickActions(mode);
-
-    // 条件自测卡片：仅在资助模式显示
-    const selfTest = document.getElementById('selfTestCard');
-    if (selfTest) {
-      if (mode === 'funding') {
-        selfTest.classList.add('show');
-      } else {
-        selfTest.classList.remove('show');
-      }
-    }
 
     document.getElementById('identityDropdown').classList.remove('show');
     showToast('已切换到' + label + '模式');
@@ -1696,10 +1677,6 @@
 
   // ===== 添加消息 =====
   function addMessage(text, role) {
-    // 移除欢迎卡片
-    const welcome = document.getElementById('welcomeCard');
-    if (welcome) welcome.style.display = 'none';
-
     const conv = document.getElementById('conversation');
     const row = document.createElement('div');
     row.className = 'message-row ' + role;
