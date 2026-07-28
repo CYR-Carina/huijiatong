@@ -356,6 +356,147 @@
     }
     .story-card .story-body.show { display: block; animation: fadeIn 0.3s; }
 
+    /* ===== 新欢迎卡片 ===== */
+    .welcome-card-new {
+      background: linear-gradient(135deg, #FFFBF5 0%, #FFF5EB 50%, #FFEDE0 100%);
+      border-radius: 20px;
+      padding: 22px 20px 18px;
+      margin-bottom: 8px;
+      border: 1px solid #FFD9B8;
+      box-shadow: 0 4px 20px rgba(232,116,60,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .welcome-card-new.elderly {
+      background: linear-gradient(135deg, #FAFCFF 0%, #F0F6FF 50%, #E8F0FF 100%);
+      border-color: #B5CDF0;
+      box-shadow: 0 4px 20px rgba(74,144,217,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .welcome-card-new.elderly .wc-avatar {
+      background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+      box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+    }
+    .welcome-card-new.elderly .wc-title { color: #2C5282; }
+    .welcome-card-new.elderly .wc-feat-text b { color: #2C5282; }
+    .welcome-card-new.elderly .wc-feat-item:hover { border-color: #8CB8E8; }
+    .welcome-card-new.elderly .sq-num {
+      background: linear-gradient(135deg, #EEF5FF, #D5E3F7);
+      color: #357ABD;
+    }
+    .welcome-card-new.elderly .sq-text { color: #3A4A65; }
+    .welcome-card-new.elderly .sq-item { border-color: #D5E3F7; }
+    .welcome-card-new.elderly .sq-item:hover {
+      background: linear-gradient(135deg, #F5F9FF 0%, #EAF2FF 100%);
+      border-color: #4A90D9;
+      box-shadow: 0 6px 16px rgba(74,144,217,0.15);
+    }
+    .welcome-card-new.elderly .sq-item:hover .sq-num {
+      background: linear-gradient(135deg, #4A90D9, #357ABD);
+      color: #fff;
+    }
+    .welcome-card-new.elderly .sq-arrow { color: #A0BCDC; }
+    .welcome-card-new.elderly .sq-item:hover .sq-arrow { color: #4A90D9; }
+    .welcome-card-new::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(232,116,60,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .welcome-card-new::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(74,144,217,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .wc-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .wc-avatar {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #E8743C 0%, #C85A28 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(232,116,60,0.3);
+      flex-shrink: 0;
+    }
+    .wc-greeting { flex: 1; }
+    .wc-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #A84820;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .wc-subtitle {
+      font-size: 13px;
+      color: #9A8068;
+      font-weight: 500;
+    }
+    .wc-desc {
+      font-size: 14px;
+      color: #6B5A48;
+      line-height: 1.7;
+      margin-bottom: 14px;
+      position: relative;
+      padding-left: 2px;
+    }
+    .wc-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .wc-feat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 12px;
+      font-size: 13px;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,217,184,0.5);
+    }
+    .wc-feat-item:hover {
+      background: #fff;
+      border-color: #FFCE99;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(232,116,60,0.1);
+    }
+    .wc-feat-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .wc-feat-text {
+      color: #5C4A3A;
+    }
+    .wc-feat-text b {
+      color: #A84820;
+      font-weight: 700;
+    }
+    .welcome-card-new .suggest-questions {
+      margin-top: 0;
+      margin-bottom: 0;
+      position: relative;
+    }
+
     /* ===== 推荐问题 ===== */
     .suggest-questions {
       display: flex;
@@ -916,71 +1057,40 @@
 <!-- ===== 主体 ===== -->
 <div class="container">
   <div class="conversation" id="conversation">
-    <!-- Agent 开局自我介绍 -->
-    <div class="msg-row">
-      <div class="avatar agent">惠</div>
-      <div class="message-content">
-        <div class="bubble agent">
-          <div style="font-size:17px;font-weight:700;color:#A84820;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:22px;">👋</span> 您好！我是惠家通
-          </div>
-          <div style="margin-bottom:14px;line-height:1.8;font-size:15px;">
-            我是专门服务乡村家庭的 AI 助手，一个人服务全家：
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:14px;">
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
-              <span style="font-size:18px;">📚</span>
-              <span><b style="color:#A84820;">学生</b><br><span style="color:#666;font-size:13px;">问资助政策</span></span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
-              <span style="font-size:18px;">🛡️</span>
-              <span><b style="color:#A84820;">老人</b><br><span style="color:#666;font-size:13px;">识别诈骗</span></span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
-              <span style="font-size:18px;">🏥</span>
-              <span><b style="color:#A84820;">全家</b><br><span style="color:#666;font-size:13px;">健康养生</span></span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
-              <span style="font-size:18px;">👴</span>
-              <span><b style="color:#A84820;">长辈</b><br><span style="color:#666;font-size:13px;">养老政策</span></span>
-            </div>
-          </div>
-          <div style="font-size:13px;color:#8B7355;text-align:center;padding-top:6px;border-top:1px dashed #FFD9B8;">
-            💡 点击下方问题试试，或直接输入您想问的
-          </div>
+    <!-- 欢迎卡片（根据身份动态更新） -->
+    <div class="welcome-card-new" id="welcomeCard">
+      <div class="wc-header">
+        <div class="wc-avatar">惠</div>
+        <div class="wc-greeting">
+          <div class="wc-title" id="wcTitle">👋 您好！我是惠家通</div>
+          <div class="wc-subtitle" id="wcSubtitle">乡村家庭智能服务助手</div>
         </div>
-        <!-- 推荐问题 -->
-        <div class="suggest-questions">
-          <div class="sq-item" onclick="quickAsk('助学贷款能贷多少钱？怎么申请？')">
-            <span class="sq-num">1</span>
-            <span class="sq-text">助学贷款能贷多少钱？怎么申请？</span>
-            <span class="sq-arrow">›</span>
-          </div>
-          <div class="sq-item" onclick="quickAsk('有人打电话说我中奖了让交手续费，是诈骗吗？')">
-            <span class="sq-num">2</span>
-            <span class="sq-text">中奖让交手续费是诈骗吗？</span>
-            <span class="sq-arrow">›</span>
-          </div>
-          <div class="sq-item" onclick="quickAsk('高血压平时要注意什么？')">
-            <span class="sq-num">3</span>
-            <span class="sq-text">高血压日常注意事项</span>
-            <span class="sq-arrow">›</span>
-          </div>
-          <div class="sq-item" onclick="quickAsk('养老金多少岁可以领？能领多少？')">
-            <span class="sq-num">4</span>
-            <span class="sq-text">养老金多少岁可以领？</span>
-            <span class="sq-arrow">›</span>
-          </div>
-          <div class="sq-item" onclick="startSelfTest()">
-            <span class="sq-num" style="background:linear-gradient(135deg,#E8743C,#C85A28);color:#fff;">★</span>
-            <span class="sq-text" style="font-weight:600;color:#A84820;">帮我看看能申请什么资助（条件自测）</span>
-            <span class="sq-arrow">›</span>
-          </div>
+      </div>
+      <div class="wc-desc" id="wcDesc">
+        一个 Agent，服务全家——选个身份开始吧，或直接点击您想问的问题：
+      </div>
+      <!-- 功能小卡片 -->
+      <div class="wc-features" id="wcFeatures">
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">📚</span>
+          <span class="wc-feat-text"><b>学生</b> 资助政策</span>
         </div>
-        <div class="message-actions">
-          <button class="action-btn" onclick="replayMsg(this)">🔊 重听</button>
-          <button class="action-btn" onclick="forwardMsg(this)">↗ 转发</button>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">🛡️</span>
+          <span class="wc-feat-text"><b>老人</b> 识别诈骗</span>
         </div>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">🏥</span>
+          <span class="wc-feat-text"><b>全家</b> 健康养生</span>
+        </div>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">👴</span>
+          <span class="wc-feat-text"><b>长辈</b> 养老政策</span>
+        </div>
+      </div>
+      <!-- 推荐问题 -->
+      <div class="suggest-questions" id="welcomeSuggestions">
+        <!-- JS 动态填充 -->
       </div>
     </div>
 
@@ -1002,26 +1112,7 @@
 
     <!-- 快捷操作卡片 -->
     <div class="quick-actions general" id="quickActions">
-      <div class="quick-action" onclick="quickAsk('助学贷款能贷多少钱？')">
-        <span class="qa-icon">💰</span>
-        <span class="qa-label">助学贷款</span>
-        <span class="qa-desc">了解额度和条件</span>
-      </div>
-      <div class="quick-action" onclick="quickAsk('有人打电话说我中奖了是诈骗吗？')">
-        <span class="qa-icon">🛡️</span>
-        <span class="qa-label">防诈骗</span>
-        <span class="qa-desc">识别常见骗局</span>
-      </div>
-      <div class="quick-action" onclick="quickAsk('高血压平时要注意什么？')">
-        <span class="qa-icon">❤️</span>
-        <span class="qa-label">健康养生</span>
-        <span class="qa-desc">慢病管理建议</span>
-      </div>
-      <div class="quick-action" onclick="quickAsk('养老金怎么领？')">
-        <span class="qa-icon">👴</span>
-        <span class="qa-label">养老政策</span>
-        <span class="qa-desc">养老金和医保</span>
-      </div>
+      <!-- JS 动态填充 -->
     </div>
   </div>
 
@@ -1256,6 +1347,101 @@
     ).join('');
   }
 
+  // ===== 更新欢迎卡片（根据身份） =====
+  function updateWelcomeCard(mode) {
+    const title = document.getElementById('wcTitle');
+    const subtitle = document.getElementById('wcSubtitle');
+    const desc = document.getElementById('wcDesc');
+    const features = document.getElementById('wcFeatures');
+    const suggestions = document.getElementById('welcomeSuggestions');
+    const card = document.getElementById('welcomeCard');
+
+    const welcomeData = {
+      funding: {
+        title: '📚 您好！我是资助政策通',
+        subtitle: '专为学生和家长服务',
+        desc: '我熟悉国家和地方各类学生资助政策，助学贷款、助学金、奖学金都能问。您可以试试这些问题：',
+        features: [
+          { icon: '💰', text: '<b>助学贷款</b> 额度·申请' },
+          { icon: '🎓', text: '<b>助学金</b> 条件·标准' },
+          { icon: '🏆', text: '<b>奖学金</b> 国奖·励志' },
+          { icon: '📊', text: '<b>条件自测</b> 智能推荐' }
+        ],
+        questions: [
+          { text: '助学贷款能贷多少钱？怎么申请？', ask: '助学贷款能贷多少钱？怎么申请？', special: false },
+          { text: '国家助学金申请条件是什么？', ask: '国家助学金申请条件是什么？', special: false },
+          { text: '国家奖学金多少钱？怎么评？', ask: '国家奖学金多少钱？怎么评？', special: false },
+          { text: '生源地贷款和校园地贷款有什么区别？', ask: '生源地贷款和校园地贷款有什么区别？', special: false },
+          { text: '帮我看看能申请什么资助（条件自测）', ask: '帮我看看能申请什么资助', special: true }
+        ]
+      },
+      elderly: {
+        title: '🛡️ 您好！我是银龄小保',
+        subtitle: '专为老人家服务',
+        desc: '我能帮您识别诈骗电话、解答健康问题、查询养老政策，说话慢一点、字大一点，您慢慢看。试试问我：',
+        features: [
+          { icon: '🚨', text: '<b>防诈骗</b> 识别骗局' },
+          { icon: '❤️', text: '<b>高血压</b> 日常注意' },
+          { icon: '💰', text: '<b>养老金</b> 领取查询' },
+          { icon: '💳', text: '<b>社保卡</b> 挂失补办' }
+        ],
+        questions: [
+          { text: '有人打电话说我中奖了让交钱，是诈骗吗？', ask: '有人打电话说我中奖了让交手续费是诈骗吗？', special: false },
+          { text: '高血压平时要注意什么？能吃什么？', ask: '高血压平时要注意什么？', special: false },
+          { text: '养老金多少岁可以领？能领多少？', ask: '养老金多少岁可以领？能领多少？', special: false },
+          { text: '社保卡丢了怎么补办？', ask: '社保卡丢了怎么办？', special: false },
+          { text: '常见的养老诈骗有哪些？', ask: '常见的养老诈骗有哪些？怎么防范？', special: true }
+        ]
+      },
+      general: {
+        title: '👋 您好！我是惠家通',
+        subtitle: '乡村家庭智能服务助手',
+        desc: '一个 Agent，服务全家——选个身份开始吧，或直接点击您想问的问题：',
+        features: [
+          { icon: '📚', text: '<b>学生</b> 资助政策' },
+          { icon: '🛡️', text: '<b>老人</b> 识别诈骗' },
+          { icon: '🏥', text: '<b>全家</b> 健康养生' },
+          { icon: '👴', text: '<b>长辈</b> 养老政策' }
+        ],
+        questions: [
+          { text: '助学贷款能贷多少钱？怎么申请？', ask: '助学贷款能贷多少钱？怎么申请？', special: false },
+          { text: '中奖让交手续费是诈骗吗？', ask: '有人打电话说我中奖了让交手续费是诈骗吗？', special: false },
+          { text: '高血压日常注意事项', ask: '高血压平时要注意什么？', special: false },
+          { text: '养老金多少岁可以领？', ask: '养老金多少岁可以领？能领多少？', special: false },
+          { text: '帮我看看能申请什么资助（条件自测）', ask: '帮我看看能申请什么资助', special: true }
+        ]
+      }
+    };
+
+    const data = welcomeData[mode] || welcomeData.general;
+
+    title.textContent = data.title;
+    subtitle.textContent = data.subtitle;
+    desc.textContent = data.desc;
+
+    // 切换卡片主题色
+    if (mode === 'elderly') {
+      card.classList.add('elderly');
+    } else {
+      card.classList.remove('elderly');
+    }
+
+    features.innerHTML = data.features.map(f =>
+      `<div class="wc-feat-item">
+        <span class="wc-feat-icon">${f.icon}</span>
+        <span class="wc-feat-text">${f.text}</span>
+      </div>`
+    ).join('');
+
+    suggestions.innerHTML = data.questions.map((q, i) =>
+      `<div class="sq-item" onclick="quickAsk('${q.ask}')">
+        <span class="sq-num" ${q.special ? 'style="background:linear-gradient(135deg,#E8743C,#C85A28);color:#fff;"' : ''}>${q.special ? '★' : (i+1)}</span>
+        <span class="sq-text" ${q.special ? 'style="font-weight:600;color:#A84820;"' : ''}>${q.text}</span>
+        <span class="sq-arrow">›</span>
+      </div>`
+    ).join('');
+  }
+
   // ===== 身份选择 =====
   function toggleIdentity() {
     document.getElementById('identityDropdown').classList.toggle('show');
@@ -1286,6 +1472,9 @@
 
     // 更新快捷操作
     updateQuickActions(mode);
+
+    // 更新欢迎卡片
+    updateWelcomeCard(mode);
 
     document.getElementById('identityDropdown').classList.remove('show');
     showToast('已切换到' + label + '模式');
@@ -2249,6 +2438,13 @@
       statusEl.style.color = '#FF9800';
     }
   }
+
+  // ===== 页面初始化 =====
+  document.addEventListener('DOMContentLoaded', function() {
+    updateQuickActions('general');
+    updateWelcomeCard('general');
+    updateAPIStatus();
+  });
 </script>
 </body>
 </html>
