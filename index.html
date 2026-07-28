@@ -310,7 +310,8 @@
       background: linear-gradient(135deg, #F8FBFF 0%, #EEF5FF 100%);
       border-radius: 16px;
       padding: 14px 18px;
-      margin-bottom: 10px;
+      margin-top: 4px;
+      margin-bottom: 12px;
       border: 1px solid #D5E3F7;
       cursor: pointer;
       transition: all 0.25s;
@@ -359,35 +360,65 @@
     .suggest-questions {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 12px;
       margin-bottom: 8px;
     }
     .sq-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      background: linear-gradient(135deg, #FFFBF5 0%, #FFF5EB 100%);
-      border: 1px solid #FFE0C0;
-      border-radius: 14px;
+      gap: 12px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #fff 0%, #FFFBF5 100%);
+      border: 1.5px solid #FFE8D0;
+      border-radius: 16px;
       cursor: pointer;
-      transition: all 0.2s;
-      font-size: 14px;
-      color: #5C4A3A;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sq-item:hover {
-      background: linear-gradient(135deg, #FFF5EB 0%, #FFE8D0 100%);
+      background: linear-gradient(135deg, #FFF8F0 0%, #FFEDDD 100%);
       border-color: #E8743C;
-      transform: translateX(4px);
-      box-shadow: 0 2px 8px rgba(232,116,60,0.12);
+      transform: translateY(-2px) translateX(4px);
+      box-shadow: 0 6px 16px rgba(232,116,60,0.15);
     }
     .sq-item:active {
-      transform: scale(0.98) translateX(2px);
+      transform: translateY(0) translateX(2px) scale(0.98);
     }
-    .sq-icon {
-      font-size: 18px;
+    .sq-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFF5EB, #FFE0C0);
+      color: #C85A28;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .sq-item:hover .sq-num {
+      transform: scale(1.1) rotate(-5deg);
+      background: linear-gradient(135deg, #E8743C, #C85A28);
+      color: #fff;
+    }
+    .sq-text {
+      flex: 1;
+      font-size: 14.5px;
+      color: #4A3A2A;
+      line-height: 1.5;
+    }
+    .sq-arrow {
+      font-size: 22px;
+      color: #D0B090;
+      font-weight: 300;
+      transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .sq-item:hover .sq-arrow {
+      color: #E8743C;
+      transform: translateX(3px);
     }
 
     /* ===== 快捷操作卡片 ===== */
@@ -890,35 +921,60 @@
       <div class="avatar agent">惠</div>
       <div class="message-content">
         <div class="bubble agent">
-          <div style="font-size:16px;font-weight:700;color:#A84820;margin-bottom:8px;">👋 您好！我是惠家通</div>
-          <div style="margin-bottom:10px;line-height:1.7;">
-            我是专门服务乡村家庭的 AI 助手，一个人服务全家：<br>
-            📚 学生问资助政策 &nbsp;&nbsp; 🛡️ 老人识别诈骗<br>
-            🏥 全家问健康养生 &nbsp;&nbsp; 👴 长辈查养老政策
+          <div style="font-size:17px;font-weight:700;color:#A84820;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">👋</span> 您好！我是惠家通
           </div>
-          <div style="font-size:13px;color:#8B7355;margin-top:4px;">您可以直接点击下方问题试试，或者输入您想问的内容～</div>
+          <div style="margin-bottom:14px;line-height:1.8;font-size:15px;">
+            我是专门服务乡村家庭的 AI 助手，一个人服务全家：
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
+              <span style="font-size:18px;">📚</span>
+              <span><b style="color:#A84820;">学生</b><br><span style="color:#666;font-size:13px;">问资助政策</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
+              <span style="font-size:18px;">🛡️</span>
+              <span><b style="color:#A84820;">老人</b><br><span style="color:#666;font-size:13px;">识别诈骗</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
+              <span style="font-size:18px;">🏥</span>
+              <span><b style="color:#A84820;">全家</b><br><span style="color:#666;font-size:13px;">健康养生</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:10px;font-size:14px;">
+              <span style="font-size:18px;">👴</span>
+              <span><b style="color:#A84820;">长辈</b><br><span style="color:#666;font-size:13px;">养老政策</span></span>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#8B7355;text-align:center;padding-top:6px;border-top:1px dashed #FFD9B8;">
+            💡 点击下方问题试试，或直接输入您想问的
+          </div>
         </div>
         <!-- 推荐问题 -->
         <div class="suggest-questions">
           <div class="sq-item" onclick="quickAsk('助学贷款能贷多少钱？怎么申请？')">
-            <span class="sq-icon">💰</span>
-            <span>助学贷款能贷多少钱？怎么申请？</span>
+            <span class="sq-num">1</span>
+            <span class="sq-text">助学贷款能贷多少钱？怎么申请？</span>
+            <span class="sq-arrow">›</span>
           </div>
           <div class="sq-item" onclick="quickAsk('有人打电话说我中奖了让交手续费，是诈骗吗？')">
-            <span class="sq-icon">🛡️</span>
-            <span>中奖让交手续费是诈骗吗？</span>
+            <span class="sq-num">2</span>
+            <span class="sq-text">中奖让交手续费是诈骗吗？</span>
+            <span class="sq-arrow">›</span>
           </div>
           <div class="sq-item" onclick="quickAsk('高血压平时要注意什么？')">
-            <span class="sq-icon">❤️</span>
-            <span>高血压日常注意事项</span>
+            <span class="sq-num">3</span>
+            <span class="sq-text">高血压日常注意事项</span>
+            <span class="sq-arrow">›</span>
           </div>
-          <div class="sq-item" onclick="quickAsk('养老金多少岁可以领？')">
-            <span class="sq-icon">👴</span>
-            <span>养老金多少岁可以领？</span>
+          <div class="sq-item" onclick="quickAsk('养老金多少岁可以领？能领多少？')">
+            <span class="sq-num">4</span>
+            <span class="sq-text">养老金多少岁可以领？</span>
+            <span class="sq-arrow">›</span>
           </div>
           <div class="sq-item" onclick="startSelfTest()">
-            <span class="sq-icon">📊</span>
-            <span>帮我看看能申请什么资助</span>
+            <span class="sq-num" style="background:linear-gradient(135deg,#E8743C,#C85A28);color:#fff;">★</span>
+            <span class="sq-text" style="font-weight:600;color:#A84820;">帮我看看能申请什么资助（条件自测）</span>
+            <span class="sq-arrow">›</span>
           </div>
         </div>
         <div class="message-actions">
