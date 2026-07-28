@@ -683,22 +683,24 @@
       border: none;
       background: #E8743C;
       border-radius: 50%;
-      font-size: 20px;
-      font-weight: 800;
+      font-size: 22px;
       color: #fff;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(232,116,60,0.4);
       transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
       z-index: 50;
       display: flex; align-items: center; justify-content: center;
-      opacity: 0.5;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85);
     }
-    .faq-fab:hover {
-      opacity: 1;
+    .faq-fab:hover, .faq-fab.visible:hover {
+      opacity: 1 !important;
       transform: scale(1.08);
       box-shadow: 0 6px 20px rgba(232,116,60,0.5);
+      pointer-events: auto;
     }
-    .faq-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.85); }
+    .faq-fab.visible { opacity: 0.85; pointer-events: auto; transform: scale(1); }
 
     /* ===== API 设置悬浮按钮 ===== */
     .api-fab {
@@ -715,22 +717,17 @@
       transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
       z-index: 50;
       display: flex; align-items: center; justify-content: center;
-      animation: apiFabPulse 2.5s ease-in-out infinite;
-      opacity: 0.7;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85);
     }
-    .api-fab:hover {
-      opacity: 1;
+    .api-fab:hover, .api-fab.visible:hover {
+      opacity: 1 !important;
       transform: scale(1.08);
       box-shadow: 0 6px 20px rgba(232,116,60,0.4);
+      pointer-events: auto;
     }
-    .api-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.85); animation: none; }
-    @keyframes apiFabPulse {
-      0%, 100% { box-shadow: 0 4px 16px rgba(232,116,60,0.3); }
-      50% { box-shadow: 0 4px 24px rgba(232,116,60,0.7); }
-    }
-    @media (max-width: 600px) {
-      .api-fab { right: 16px; bottom: 230px; width: 44px; height: 44px; font-size: 13px; }
-    }
+    .api-fab.visible { opacity: 0.85; pointer-events: auto; transform: scale(1); }
 
     /* ===== FAQ 弹窗 ===== */
     .faq-modal {
@@ -1973,27 +1970,54 @@
   }
 
   // ===== 悬浮按钮自动隐藏 =====
-  let scrollTimer = null;
+  let fabTimer = null;
   function showFabs() {
     const fabs = document.querySelectorAll('.api-fab, .faq-fab');
-    fabs.forEach(el => el.classList.remove('hidden'));
+    fabs.forEach(el => el.classList.add('visible'));
   }
-  function hideFabsTemp() {
+  function hideFabs() {
     const fabs = document.querySelectorAll('.api-fab, .faq-fab');
-    fabs.forEach(el => el.classList.add('hidden'));
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(showFabs, 1500);
+    fabs.forEach(el => el.classList.remove('visible'));
   }
-  // 对话区滚动时隐藏，停止后 1.5 秒重新出现
+  function triggerFabs() {
+    showFabs();
+    clearTimeout(fabTimer);
+    fabTimer = setTimeout(hideFabs, 2000);
+  }
+  // 页面加载1秒后自动隐藏
+  setTimeout(hideFabs, 1000);
+  // 首次加载后显示1.5秒让用户知道有按钮
+  showFabs();
+  // 对话区滚动时显示
   const convEl = document.getElementById('conversation');
   if (convEl) {
-    convEl.addEventListener('scroll', function() {
-      hideFabsTemp();
-    }, { passive: true });
+    convEl.addEventListener('scroll', triggerFabs, { passive: true });
   }
-  // 输入时隐藏
-  document.addEventListener('input', function() {
-    hideFabsTemp();
+  // 输入框聚焦/输入时显示
+  const textInput = document.getElementById('textInput');
+  if (textInput) {
+    textInput.addEventListener('focus', triggerFabs);
+    textInput.addEventListener('input', triggerFabs);
+  }
+  // 鼠标移动到右侧区域时显示
+  document.addEventListener('mousemove', function(e) {
+    const w = window.innerWidth;
+    if (e.clientX > w - 80) {
+      triggerFabs();
+    }
+  });
+  // 点击页面任何位置触发一次
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.api-fab') && !e.target.closest('.faq-fab') && !e.target.closest('.api-modal') && !e.target.closest('.faq-modal')) {
+      triggerFabs();
+    }
+  });
+  // 移动端：触摸屏幕右侧显示
+  document.addEventListener('touchstart', function(e) {
+    const touch = e.touches[0];
+    if (touch && touch.clientX > window.innerWidth - 100) {
+      triggerFabs();
+    }
   });
 
   // ===== FAQ =====
