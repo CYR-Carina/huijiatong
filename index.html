@@ -709,16 +709,14 @@
       border: 2px solid #E8743C;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      font-size: 14px;
-      font-weight: 800;
-      color: #C85A28;
+      font-size: 22px;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(0,0,0,0.15);
       transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
       z-index: 50;
       display: flex; align-items: center; justify-content: center;
       animation: apiFabPulse 2.5s ease-in-out infinite;
-      opacity: 0.5;
+      opacity: 0.7;
     }
     .api-fab:hover {
       opacity: 1;
@@ -863,7 +861,7 @@
     @media (max-width: 520px) {
       .header { border-radius: 0; }
       .faq-fab { right: 16px; bottom: 140px; }
-      .api-fab { right: 16px; bottom: 200px; }
+      .api-fab { right: 16px; bottom: 200px; width: 44px; height: 44px; font-size: 20px; }
       .bubble { font-size: 15px; }
     }
     @media (min-width: 521px) {
@@ -1008,8 +1006,8 @@
 </button>
 
 <!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
-<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">设</button>
-<button class="faq-fab" onclick="toggleFAQ()" title="常见问题">?</button>
+<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">⚙️</button>
+<button class="faq-fab" onclick="toggleFAQ()" title="常见问题">❓</button>
 
 <!-- ===== FAQ 弹窗 ===== -->
 <div class="faq-modal" id="faqModal" onclick="if(event.target===this)toggleFAQ()">
@@ -1185,22 +1183,22 @@
 
     const actions = {
       funding: [
-        { icon: '￥', label: '助学贷款', desc: '额度·申请·材料', ask: '助学贷款能贷多少钱？' },
-        { icon: '补', label: '助学金', desc: '申请条件和标准', ask: '国家助学金多少钱？' },
-        { icon: '奖', label: '奖学金', desc: '国奖·励志奖', ask: '国家奖学金多少钱？' },
-        { icon: '?', label: '申请流程', desc: '手把手教你办', ask: '助学贷款怎么申请？' }
+        { icon: '💰', label: '助学贷款', desc: '额度·申请·材料', ask: '助学贷款能贷多少钱？' },
+        { icon: '🎓', label: '助学金', desc: '申请条件和标准', ask: '国家助学金多少钱？' },
+        { icon: '🏆', label: '奖学金', desc: '国奖·励志奖', ask: '国家奖学金多少钱？' },
+        { icon: '💡', label: '申请流程', desc: '手把手教你办', ask: '助学贷款怎么申请？' }
       ],
       elderly: [
-        { icon: '!', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
-        { icon: '+', label: '高血压', desc: '日常注意事项', ask: '高血压平时要注意什么？' },
-        { icon: '60', label: '养老金', desc: '领取条件和标准', ask: '养老金怎么领？' },
-        { icon: '卡', label: '社保卡', desc: '挂失和补办', ask: '社保卡丢了怎么办？' }
+        { icon: '🛡️', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
+        { icon: '❤️', label: '高血压', desc: '日常注意事项', ask: '高血压平时要注意什么？' },
+        { icon: '💰', label: '养老金', desc: '领取条件和标准', ask: '养老金怎么领？' },
+        { icon: '💳', label: '社保卡', desc: '挂失和补办', ask: '社保卡丢了怎么办？' }
       ],
       general: [
-        { icon: '￥', label: '助学贷款', desc: '了解额度和条件', ask: '助学贷款能贷多少钱？' },
-        { icon: '!', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
-        { icon: '+', label: '健康养生', desc: '慢病管理建议', ask: '高血压平时要注意什么？' },
-        { icon: '60', label: '养老政策', desc: '养老金和医保', ask: '养老金怎么领？' }
+        { icon: '💰', label: '助学贷款', desc: '了解额度和条件', ask: '助学贷款能贷多少钱？' },
+        { icon: '🛡️', label: '防诈骗', desc: '识别常见骗局', ask: '有人打电话说我中奖了是诈骗吗？' },
+        { icon: '❤️', label: '健康养生', desc: '慢病管理建议', ask: '高血压平时要注意什么？' },
+        { icon: '👴', label: '养老政策', desc: '养老金和医保', ask: '养老金怎么领？' }
       ]
     };
 
