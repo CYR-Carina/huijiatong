@@ -826,6 +826,11 @@
       transition: all 0.2s;
     }
     .toolbar-btn:hover { border-color: #E8743C; color: #E8743C; background: #FFF8E7; }
+    .toolbar-btn.active {
+      background: #E8743C;
+      border-color: #E8743C;
+      color: white;
+    }
 
     /* ===== 朗读控制按钮（固定在屏幕顶部）===== */
     .stop-speech-btn {
@@ -1200,7 +1205,8 @@
     </div>
     <div class="input-toolbar">
       <button class="toolbar-btn" onclick="clearChat()" title="清空对话">🗑️ 清空</button>
-      <div class="speed-switch">
+      <button class="toolbar-btn" id="autoSpeechBtn" onclick="toggleAutoSpeech()" title="自动朗读开关">🔊 自动朗读</button>
+      <div class="speed-switch" id="speedSwitch">
         <span class="speed-label">语速</span>
         <div class="speed-options">
           <div class="speed-option" onclick="setSpeed(1.0,this)">正常</div>
@@ -1570,12 +1576,45 @@
     // 切换身份清空对话历史
     chatHistory = [];
 
+    // 老人模式默认开启自动朗读，其他模式默认关闭
+    autoSpeechEnabled = (mode === 'elderly');
+    updateAutoSpeechBtn();
+    // 如果切换到非老人模式，停止正在播放的语音
+    if (!autoSpeechEnabled && 'speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+
     document.getElementById('identityDropdown').classList.remove('show');
     showToast('已切换到' + label + '模式');
   }
 
   // ===== 对话历史管理 =====
   let chatHistory = [];
+  let autoSpeechEnabled = false; // 默认关闭，老人模式自动开启
+
+  function toggleAutoSpeech() {
+    autoSpeechEnabled = !autoSpeechEnabled;
+    updateAutoSpeechBtn();
+    showToast(autoSpeechEnabled ? '已开启自动朗读' : '已关闭自动朗读');
+    if (!autoSpeechEnabled && 'speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+  }
+
+  function updateAutoSpeechBtn() {
+    const btn = document.getElementById('autoSpeechBtn');
+    const speedSwitch = document.getElementById('speedSwitch');
+    if (!btn) return;
+    if (autoSpeechEnabled) {
+      btn.classList.add('active');
+      btn.textContent = '🔊 自动朗读';
+      if (speedSwitch) speedSwitch.style.display = 'flex';
+    } else {
+      btn.classList.remove('active');
+      btn.textContent = '🔇 已关闭';
+      if (speedSwitch) speedSwitch.style.display = 'none';
+    }
+  }
 
   function addHistory(role, content) {
     chatHistory.push({ role: role, content: content });
@@ -2156,11 +2195,11 @@
     time.textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     content.appendChild(time);
 
-    // Agent消息自动朗读
+    // Agent消息自动朗读（仅在开关开启时）
     if (role === 'agent') {
-      // 语音控制：朗读后附加暂停按钮
-      setTimeout(() => speakText(bubble.textContent), 300);
-
+      if (autoSpeechEnabled) {
+        setTimeout(() => speakText(bubble.textContent), 300);
+      }
       const actions = document.createElement('div');
       actions.className = 'message-actions';
       actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">🔊 重听</button><button class="action-btn" onclick="copyMsg(this)">📋 复制</button><button class="action-btn" onclick="forwardMsg(this)">↗ 转发</button>';
@@ -2681,6 +2720,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     updateWelcomeCard('general');
     updateAPIStatus();
+    updateAutoSpeechBtn(); // 初始化语音开关状态（默认关闭，语速选择隐藏）
   });
 </script>
 </body>
