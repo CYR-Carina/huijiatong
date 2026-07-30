@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>惠家通 — 乡村家庭智能服务 Agent</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(232,116,60,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(212,165,116,0.08) 0%, transparent 50%),
+        linear-gradient(135deg, #FFFBF5 0%, #FFF5EB 50%, #FFF0E0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      color: #2D2A26;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23E8743C' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== 顶栏 ===== */
+    .header {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(135deg, #E8743C 0%, #C85A28 60%, #A84820 100%);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(168, 72, 32, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-logo {
+      font-size: 22px;
+      font-weight: 900;
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, #fff 0%, #FFF0E0 100%);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #C85A28;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+      animation: logoFloat 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-2px) rotate(-3deg); }
+    }
+    .header-title-group { display: flex; flex-direction: column; }
+    .header-title {
+      font-size: 22px; font-weight: 800; color: #fff;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .header-subtitle {
+      font-size: 11px; color: rgba(255,255,255,0.85);
+    }
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 3px;
+      white-space: nowrap;
+      transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* ===== 身份选择 ===== */
+    .identity-select {
+      position: relative;
+    }
+    .identity-btn {
+      display: flex;
+      align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .identity-btn:hover { background: rgba(255,255,255,0.3); }
+    .identity-btn:active { transform: scale(0.96); }
+    #identityIcon {
+      font-size: 12px;
+      font-weight: 700;
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .identity-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 180px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .identity-dropdown.show { display: block; animation: dropIn 0.2s ease; }
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .identity-option {
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #333;
+      transition: all 0.15s;
+    }
+    .identity-option:hover { background: #FFF0E0; }
+    .identity-option.active {
+      background: #FFE5D0;
+      color: #C85A28;
+      font-weight: 600;
+    }
+    .identity-option .icon {
+      font-size: 13px;
+      font-weight: 700;
+      width: 24px; height: 24px;
+      background: #FFF0E0;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #C85A28;
+    }
+    .identity-option .check {
+      margin-left: auto;
+      display: none;
+    }
+    .identity-option.active .check { display: inline; }
+
+    /* ===== 主体容器 ===== */
+    .container {
+      width: 100%;
+      max-width: 520px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #FFFBF5;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+      position: relative;
+      z-index: 1;
+      border-radius: 0 0 20px 20px;
+      overflow: hidden;
+    }
+
+    .container.funding-mode { box-shadow: 0 0 40px rgba(232,116,60,0.08); }
+    .container.elderly-mode { box-shadow: 0 0 40px rgba(74,144,217,0.08); }
+    .container.general-mode { box-shadow: 0 0 40px rgba(232,116,60,0.08); }
+
+    /* ===== 对话区 ===== */
+    .conversation {
+      flex: 1;
+      padding: 18px 12px 60px 16px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    .conversation::-webkit-scrollbar { width: 4px; }
+    .conversation::-webkit-scrollbar-track { background: transparent; }
+    .conversation::-webkit-scrollbar-thumb {
+      background: rgba(232,116,60,0.25);
+      border-radius: 2px;
+    }
+    .conversation::-webkit-scrollbar-thumb:hover { background: rgba(232,116,60,0.5); }
+
+    .message-row {
+      display: flex;
+      gap: 10px;
+      max-width: 100%;
+      animation: msgIn 0.35s ease;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message-row.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .avatar.agent { background: #FFF5EB; border: 2px solid #E8743C; color: #C85A28; }
+    .avatar.user { background: #E8743C; border: 2px solid #A84820; color: #fff; }
+
+    .message-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: calc(100% - 56px);
+    }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #2D2A26;
+      word-wrap: break-word;
+      word-break: break-word;
+      transition: transform 0.2s;
+    }
+    .bubble.agent {
+      background: linear-gradient(135deg, #FFFDF8 0%, #FFF5EB 100%);
+      border: 1px solid #FFE5D0;
+      border-radius: 18px 18px 18px 4px;
+      box-shadow: 0 2px 8px rgba(232,116,60,0.06);
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, #E8743C 0%, #C85A28 100%);
+      color: #fff;
+      border-radius: 18px 18px 4px 18px;
+      box-shadow: 0 3px 10px rgba(168,72,32,0.25);
+    }
+    .bubble strong { color: #A84820; font-weight: 700; }
+    .bubble.user strong { color: #FFE5D0; }
+    .bubble .emoji { font-size: 18px; }
+
+    /* 气泡内的警示 */
+    .bubble .alert {
+      display: block;
+      padding: 10px 14px;
+      background: #FFF0F0;
+      border-left: 4px solid #FF4444;
+      border-radius: 8px;
+      color: #CC0000;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    .bubble .tip {
+      display: block;
+      padding: 8px 12px;
+      background: #F0F7FF;
+      border-left: 4px solid #4A90D9;
+      border-radius: 8px;
+      color: #2C5282;
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 8px;
+      padding: 2px 4px;
+    }
+    .message-actions .action-btn {
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .message-actions .action-btn:hover { background: #f0f0f0; color: #E8743C; }
+    .msg-time {
+      font-size: 10px;
+      color: #bbb;
+      padding: 0 4px;
+    }
+    .message-row.user .msg-time { text-align: right; }
+
+    /* ===== 三下乡故事 ===== */
+    .story-card {
+      background: linear-gradient(135deg, #F8FBFF 0%, #EEF5FF 100%);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #D5E3F7;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 2px 8px rgba(74,144,217,0.06);
+      overflow: visible;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .story-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74,144,217,0.15);
+      border-color: #4A90D9;
+    }
+    .story-card .story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .story-card .story-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2C5282;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .story-card .story-toggle {
+      font-size: 12px;
+      color: #4A90D9;
+      transition: transform 0.3s;
+      font-weight: 700;
+    }
+    .story-card .story-toggle.open { transform: rotate(180deg); }
+    .story-card .story-body {
+      display: none;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #4A5A75;
+      line-height: 1.8;
+      border-top: 1px dashed #B5CDF0;
+      padding-top: 12px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .story-card .story-body.show { display: block; animation: fadeIn 0.3s; }
+
+    /* ===== 新欢迎卡片 ===== */
+    .welcome-card-new {
+      background: linear-gradient(135deg, #FFFBF5 0%, #FFF5EB 50%, #FFEDE0 100%);
+      border-radius: 20px;
+      padding: 22px 20px 18px;
+      margin-bottom: 8px;
+      border: 1px solid #FFD9B8;
+      box-shadow: 0 4px 20px rgba(232,116,60,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .welcome-card-new.elderly {
+      background: linear-gradient(135deg, #FAFCFF 0%, #F0F6FF 50%, #E8F0FF 100%);
+      border-color: #B5CDF0;
+      box-shadow: 0 4px 20px rgba(74,144,217,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .welcome-card-new.elderly .wc-avatar {
+      background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+      box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+    }
+    .welcome-card-new.elderly .wc-title { color: #2C5282; }
+    .welcome-card-new.elderly .wc-feat-text b { color: #2C5282; }
+    .welcome-card-new.elderly .wc-feat-item:hover { border-color: #8CB8E8; }
+    .welcome-card-new.elderly .sq-num {
+      background: linear-gradient(135deg, #EEF5FF, #D5E3F7);
+      color: #357ABD;
+    }
+    .welcome-card-new.elderly .sq-text { color: #3A4A65; }
+    .welcome-card-new.elderly .sq-item { border-color: #D5E3F7; }
+    .welcome-card-new.elderly .sq-item:hover {
+      background: linear-gradient(135deg, #F5F9FF 0%, #EAF2FF 100%);
+      border-color: #4A90D9;
+      box-shadow: 0 6px 16px rgba(74,144,217,0.15);
+    }
+    .welcome-card-new.elderly .sq-item:hover .sq-num {
+      background: linear-gradient(135deg, #4A90D9, #357ABD);
+      color: #fff;
+    }
+    .welcome-card-new.elderly .sq-arrow { color: #A0BCDC; }
+    .welcome-card-new.elderly .sq-item:hover .sq-arrow { color: #4A90D9; }
+    .welcome-card-new.elderly .wc-feat-item {
+      border-color: rgba(141,184,232,0.5);
+      background: rgba(255,255,255,0.85);
+    }
+    .welcome-card-new.elderly .wc-feat-item::before {
+      background: linear-gradient(90deg, #4A90D9, #8ABCF0);
+    }
+    .welcome-card-new.elderly .wc-feat-item:hover {
+      border-color: #4A90D9;
+      box-shadow: 0 6px 16px rgba(74,144,217,0.18);
+    }
+    .welcome-card-new::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(232,116,60,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .welcome-card-new::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(74,144,217,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .wc-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .wc-avatar {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #E8743C 0%, #C85A28 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(232,116,60,0.3);
+      flex-shrink: 0;
+    }
+    .wc-greeting { flex: 1; }
+    .wc-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #A84820;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .wc-subtitle {
+      font-size: 13px;
+      color: #9A8068;
+      font-weight: 500;
+    }
+    .wc-desc {
+      font-size: 14px;
+      color: #6B5A48;
+      line-height: 1.7;
+      margin-bottom: 14px;
+      position: relative;
+      padding-left: 2px;
+    }
+    .wc-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .wc-feat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 12px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 14px;
+      font-size: 14px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1.5px solid rgba(255,217,184,0.6);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .wc-feat-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #E8743C, #FFCE99);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .wc-feat-item:hover {
+      background: #fff;
+      border-color: #E8743C;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(232,116,60,0.18);
+    }
+    .wc-feat-item:hover::before { opacity: 1; }
+    .wc-feat-item:active { transform: translateY(-1px) scale(0.97); }
+    .wc-feat-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .wc-feat-text {
+      color: #5C4A3A;
+    }
+    .wc-feat-text b {
+      color: #A84820;
+      font-weight: 700;
+    }
+    .welcome-card-new .suggest-questions {
+      margin-top: 0;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    /* ===== 推荐问题 ===== */
+    .suggest-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+    .sq-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #fff 0%, #FFFBF5 100%);
+      border: 1.5px solid #FFE8D0;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sq-item:hover {
+      background: linear-gradient(135deg, #FFF8F0 0%, #FFEDDD 100%);
+      border-color: #E8743C;
+      transform: translateY(-2px) translateX(4px);
+      box-shadow: 0 6px 16px rgba(232,116,60,0.15);
+    }
+    .sq-item:active {
+      transform: translateY(0) translateX(2px) scale(0.98);
+    }
+    .sq-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFF5EB, #FFE0C0);
+      color: #C85A28;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .sq-item:hover .sq-num {
+      transform: scale(1.1) rotate(-5deg);
+      background: linear-gradient(135deg, #E8743C, #C85A28);
+      color: #fff;
+    }
+    .sq-text {
+      flex: 1;
+      font-size: 14.5px;
+      color: #4A3A2A;
+      line-height: 1.5;
+    }
+    .sq-arrow {
+      font-size: 22px;
+      color: #D0B090;
+      font-weight: 300;
+      transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .sq-item:hover .sq-arrow {
+      color: #E8743C;
+      transform: translateX(3px);
+    }
+
+    /* ===== 快捷操作卡片 ===== */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+    .quick-action {
+      background: linear-gradient(135deg, #fff 0%, #FFFBF5 100%);
+      border: 1px solid #f0e8e0;
+      border-radius: 16px;
+      padding: 14px 10px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .quick-action::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #E8743C, #FFCE99);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .quick-action:hover {
+      border-color: #E8743C;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(232,116,60,0.18);
+    }
+    .quick-action:hover::before { opacity: 1; }
+    .quick-action:active { transform: scale(0.94); }
+    .quick-action .qa-icon {
+      font-size: 28px;
+      display: inline-flex;
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #FFF5EB, #FFE5D0);
+      border-radius: 50%;
+      align-items: center; justify-content: center;
+      margin-bottom: 6px;
+      box-shadow: 0 2px 6px rgba(232,116,60,0.12);
+      transition: transform 0.3s;
+    }
+    .quick-action:hover .qa-icon {
+      transform: scale(1.1) rotate(-5deg);
+    }
+    .quick-action .qa-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #3D2817;
+      display: block;
+    }
+    .quick-action .qa-desc {
+      font-size: 10px;
+      color: #999;
+      margin-top: 2px;
+      display: block;
+    }
+    .quick-actions.funding .quick-action::before {
+      background: linear-gradient(90deg, #E8743C, #FFCE99);
+      opacity: 0.8;
+    }
+    .quick-actions.elderly .quick-action::before {
+      background: linear-gradient(90deg, #4A90D9, #8ABCF0);
+      opacity: 0.8;
+    }
+
+    /* ===== 模式切换动画 ===== */
+    .mode-badge {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    .mode-badge.pop {
+      animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes badgePop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    /* ===== 条件自测入口卡片 ===== */
+    .self-test-card {
+      background: linear-gradient(135deg, #F0F7FF 0%, #DCEAFF 100%);
+      border: 1px solid #B5D5F8;
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: none;
+      box-shadow: 0 2px 8px rgba(74,144,217,0.08);
+    }
+    .self-test-card.show { display: block; animation: fadeIn 0.4s; }
+    .self-test-card:hover {
+      border-color: #4A90D9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74,144,217,0.18);
+    }
+    .self-test-card .st-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .self-test-card .st-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, #4A90D9, #2C5282);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(74,144,217,0.3);
+    }
+    .self-test-card .st-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2C5282;
+    }
+    .self-test-card .st-desc {
+      font-size: 12px;
+      color: #6A7A95;
+      margin-top: 2px;
+    }
+    .self-test-card .st-arrow {
+      margin-left: auto;
+      font-size: 20px;
+      color: #4A90D9;
+      font-weight: 700;
+      transition: transform 0.2s;
+    }
+    .self-test-card:hover .st-arrow { transform: translateX(3px); }
+
+    /* ===== 输入区 ===== */
+    .input-area {
+      padding: 10px 16px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, #fff 30%);
+      border-top: 1px solid #f0f0f0;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFFBF5;
+      border-radius: 26px;
+      padding: 4px 4px 4px 18px;
+      border: 2px solid #FFE5D0;
+      transition: all 0.25s;
+    }
+    .input-row:focus-within {
+      border-color: #E8743C;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(232,116,60,0.12), 0 4px 12px rgba(232,116,60,0.15);
+    }
+    .text-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      color: #2D2A26;
+      outline: none;
+      padding: 10px 0;
+      font-family: inherit;
+    }
+    .text-input::placeholder { color: #B8A89C; }
+
+    .mic-btn {
+      width: 42px; height: 42px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .mic-btn:hover { background: #FFE5D0; transform: scale(1.05); }
+    .mic-btn.recording {
+      background: #FF4444;
+      animation: pulse 1s infinite;
+      box-shadow: 0 0 0 0 rgba(255,68,68,0.7);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,68,68,0.7); }
+      50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(255,68,68,0); }
+    }
+
+    .send-btn {
+      width: 44px; height: 44px;
+      border: none;
+      background: linear-gradient(135deg, #E8743C 0%, #C85A28 100%);
+      border-radius: 50%;
+      font-size: 20px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(232,116,60,0.35);
+    }
+    .send-btn:hover { transform: scale(1.06) rotate(-5deg); box-shadow: 0 5px 14px rgba(232,116,60,0.5); }
+    .send-btn:active { transform: scale(0.92); }
+
+    .speed-switch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .speed-label { font-size: 12px; color: #999; }
+
+    .input-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .toolbar-btn {
+      background: none;
+      border: 1px solid #e0d0c0;
+      color: #888;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toolbar-btn:hover { border-color: #E8743C; color: #E8743C; background: #FFF8E7; }
+
+    /* ===== 朗读控制按钮（固定在屏幕顶部）===== */
+    .stop-speech-btn {
+      display: none;
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      align-items: center;
+      gap: 6px;
+      background: #E8743C;
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(232,116,60,0.4);
+      z-index: 250;
+      max-width: 90vw;
+    }
+    .stop-speech-btn:hover { background: #C85A28; transform: translateX(-50%) scale(1.03); }
+    .stop-speech-btn:active { transform: translateX(-50%) scale(0.96); }
+    .stop-speech-btn .stop-icon { font-size: 14px; }
+    .speed-options { display: flex; gap: 4px; }
+    .speed-option {
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #999;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid #eee;
+    }
+    .speed-option:hover { border-color: #E8743C; color: #E8743C; }
+    .speed-option.active {
+      background: #E8743C;
+      color: #fff;
+      border-color: #E8743C;
+    }
+
+    /* ===== FAQ 悬浮按钮 ===== */
+    .faq-fab {
+      position: fixed;
+      bottom: 140px;
+      right: max(calc(50vw - 260px + 16px), 16px);
+      width: 48px; height: 48px;
+      border: none;
+      background: #E8743C;
+      border-radius: 50%;
+      font-size: 22px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(232,116,60,0.4);
+      transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
+      z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85);
+    }
+    .faq-fab:hover, .faq-fab.visible:hover {
+      opacity: 1 !important;
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(232,116,60,0.5);
+      pointer-events: auto;
+    }
+    .faq-fab.visible { opacity: 0.85; pointer-events: auto; transform: scale(1); }
+
+    /* ===== API 设置悬浮按钮 ===== */
+    .api-fab {
+      position: fixed;
+      bottom: 200px;
+      right: max(calc(50vw - 260px + 16px), 16px);
+      width: 48px; height: 48px;
+      border: 2px solid #E8743C;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: opacity 0.4s, transform 0.3s, box-shadow 0.2s;
+      z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85);
+    }
+    .api-fab:hover, .api-fab.visible:hover {
+      opacity: 1 !important;
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(232,116,60,0.4);
+      pointer-events: auto;
+    }
+    .api-fab.visible { opacity: 0.85; pointer-events: auto; transform: scale(1); }
+
+    /* ===== FAQ 弹窗 ===== */
+    .faq-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      backdrop-filter: blur(2px);
+    }
+    .faq-modal.show { display: flex; animation: fadeIn 0.2s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .faq-card {
+      background: #fff;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .faq-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-header span { font-size: 18px; font-weight: 700; color: #333; }
+    .faq-close {
+      background: none; border: none;
+      font-size: 24px; color: #999;
+      cursor: pointer;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .faq-close:hover { background: #f0f0f0; }
+
+    .faq-body { padding: 12px 0; }
+    .faq-category {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-bottom: 1px solid #f8f8f8;
+    }
+    .faq-category:last-child { border-bottom: none; }
+    .faq-category:hover { background: #FFF8E7; }
+    .faq-category .faq-icon {
+      font-size: 12px;
+      font-weight: 800;
+      width: 26px; height: 26px;
+      background: #FFF0E0;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #C85A28;
+      flex-shrink: 0;
+    }
+    .faq-category .faq-name { font-size: 15px; color: #333; flex: 1; }
+    .faq-category .faq-count { font-size: 12px; color: #bbb; }
+    .faq-category .faq-arrow { color: #ccc; font-size: 14px; }
+
+    .faq-sub {
+      display: none;
+      padding: 0 20px 12px;
+    }
+    .faq-sub.show { display: block; }
+    .faq-item {
+      padding: 10px 12px;
+      margin: 4px 0;
+      background: #f8f8f8;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #555;
+      transition: all 0.15s;
+    }
+    .faq-item:hover { background: #FFE5D0; color: #C85A28; }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-size: 14px;
+      display: none;
+      z-index: 999;
+      backdrop-filter: blur(4px);
+    }
+    .toast.show { display: block; animation: toastIn 0.3s ease; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ===== Loading ===== */
+    .loading-bubble {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      padding: 14px 20px !important;
+    }
+    .loading-bubble .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: #E8743C;
+      animation: dotPulse 1.4s infinite ease-in-out;
+    }
+    .loading-bubble .dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-bubble .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .loading-dots { display: none; }
+
+    /* ===== 回到底部按钮 ===== */
+    .scroll-bottom-btn {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      width: 40px; height: 40px;
+      border: none;
+      background: rgba(232,116,60,0.9);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 40;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(232,116,60,0.3);
+      backdrop-filter: blur(4px);
+    }
+    .scroll-bottom-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) scale(1);
+    }
+    .scroll-bottom-btn:hover { background: #C85A28; transform: translateX(-50%) scale(1.08); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 520px) {
+      .header { border-radius: 0; }
+      .faq-fab { right: 16px; bottom: 140px; }
+      .api-fab { right: 16px; bottom: 200px; width: 44px; height: 44px; font-size: 20px; }
+      .bubble { font-size: 15px; }
+    }
+    @media (min-width: 521px) {
+      .container { border-radius: 16px 16px 0 0; margin-top: 10px; }
+      .header { border-radius: 16px 16px 0 0; }
+    }
+
+    /* ===== 打字效果光标 ===== */
+    .typing-cursor::after {
+      content: "|";
+      animation: blink 0.8s infinite;
+      color: #E8743C;
+      font-weight: 300;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+
+<!-- ===== 顶栏 ===== -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">惠</div>
+    <div class="header-title-group">
+      <span class="header-title">惠家通</span>
+      <span class="mode-badge" id="modeBadge">? 随便问问</span>
+    </div>
+  </div>
+  <div class="identity-select">
+    <button class="identity-btn" id="identityBtn" onclick="toggleIdentity()">
+      <span id="identityIcon">?</span>
+      <span id="identityLabel">随便问问</span>
+      <span>▾</span>
+    </button>
+    <div class="identity-dropdown" id="identityDropdown">
+      <div class="identity-option" onclick="selectIdentity('funding','学','学生/家长')">
+        <span class="icon">学</span><span>学生/家长</span><span class="check">✓</span>
+      </div>
+      <div class="identity-option" onclick="selectIdentity('elderly','老','老人家')">
+        <span class="icon">老</span><span>老人家</span><span class="check">✓</span>
+      </div>
+      <div class="identity-option active" onclick="selectIdentity('general','?','随便问问')">
+        <span class="icon">?</span><span>随便问问</span><span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 主体 ===== -->
+<div class="container">
+  <div class="conversation" id="conversation">
+    <!-- 欢迎卡片（根据身份动态更新） -->
+    <div class="welcome-card-new" id="welcomeCard">
+      <div class="wc-header">
+        <div class="wc-avatar">惠</div>
+        <div class="wc-greeting">
+          <div class="wc-title" id="wcTitle">👋 您好！我是惠家通</div>
+          <div class="wc-subtitle" id="wcSubtitle">乡村家庭智能服务助手</div>
+        </div>
+      </div>
+      <div class="wc-desc" id="wcDesc">
+        一个 Agent，服务全家——选个身份开始吧，或直接点击您想问的问题：
+      </div>
+      <!-- 功能小卡片 -->
+      <div class="wc-features" id="wcFeatures">
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">📚</span>
+          <span class="wc-feat-text"><b>学生</b> 资助政策</span>
+        </div>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">🛡️</span>
+          <span class="wc-feat-text"><b>老人</b> 识别诈骗</span>
+        </div>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">🏥</span>
+          <span class="wc-feat-text"><b>全家</b> 健康养生</span>
+        </div>
+        <div class="wc-feat-item">
+          <span class="wc-feat-icon">👴</span>
+          <span class="wc-feat-text"><b>长辈</b> 养老政策</span>
+        </div>
+      </div>
+      <!-- 推荐问题 -->
+      <div class="suggest-questions" id="welcomeSuggestions">
+        <!-- JS 动态填充 -->
+      </div>
+    </div>
+
+    <!-- 三下乡故事 -->
+    <div class="story-card" id="storyCard" onclick="toggleStory()">
+      <div class="story-header">
+        <span class="story-title">★ 从三下乡中来 — 项目背景故事</span>
+        <span class="story-toggle" id="storyToggle">▾</span>
+      </div>
+      <div class="story-body" id="storyBody">
+        2026年暑期，我们参加了"铸信助学·青春护航"三下乡社会实践活动，
+        走进广东省新田镇，入户走访了困难学生家庭和留守老人。<br><br>
+        我们发现：<strong>超过70%的家庭对国家资助政策几乎不了解</strong>，
+        留守老人面对诈骗电话和健康问题不知道该问谁。<br><br>
+        于是我们做了<b>惠家通</b>——<br>
+        一个 Agent，服务整个农村家庭。
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 输入区 ===== -->
+  <div class="input-area">
+    <div class="input-row">
+      <input type="text" class="text-input" id="textInput"
+             placeholder="输入您的问题..." onkeypress="if(event.key==='Enter')sendMessage()">
+      <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="语音输入">🎤</button>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送">➤</button>
+    </div>
+    <div class="input-toolbar">
+      <button class="toolbar-btn" onclick="clearChat()" title="清空对话">🗑️ 清空</button>
+      <div class="speed-switch">
+        <span class="speed-label">语速</span>
+        <div class="speed-options">
+          <div class="speed-option" onclick="setSpeed(1.0,this)">正常</div>
+          <div class="speed-option active" onclick="setSpeed(0.8,this)">慢速</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 朗读控制按钮（浮动，播放时显示） -->
+<button class="stop-speech-btn" id="stopBtn" onclick="togglePauseSpeech()">
+  <span class="stop-icon" id="stopBtnIcon">⏸</span>
+  <span id="stopBtnText">暂停</span>
+</button>
+
+<!-- ===== API 设置按钮 + FAQ 按钮 ===== -->
+<button class="api-fab" onclick="toggleAPISettings()" title="API 设置">⚙️</button>
+<button class="faq-fab" onclick="toggleFAQ()" title="常见问题">❓</button>
+
+<!-- ===== FAQ 弹窗 ===== -->
+<div class="faq-modal" id="faqModal" onclick="if(event.target===this)toggleFAQ()">
+  <div class="faq-card">
+    <div class="faq-header">
+      <span>? 常见问题</span>
+      <button class="faq-close" onclick="toggleFAQ()">×</button>
+    </div>
+    <div class="faq-body" id="faqBody">
+      <div class="faq-category" onclick="toggleSub(this)">
+        <span class="faq-icon">学</span>
+        <span class="faq-name">资助政策</span>
+        <span class="faq-count">6个问题</span>
+        <span class="faq-arrow">▸</span>
+      </div>
+      <div class="faq-sub">
+        <div class="faq-item" onclick="askFAQ('助学贷款能贷多少钱？')">助学贷款能贷多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('助学贷款怎么申请？需要什么材料？')">助学贷款怎么申请？</div>
+        <div class="faq-item" onclick="askFAQ('什么是绿色通道？')">什么是绿色通道？</div>
+        <div class="faq-item" onclick="askFAQ('国家奖学金多少钱？')">国家奖学金多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('国家助学金多少钱？')">国家助学金多少钱？</div>
+        <div class="faq-item" onclick="askFAQ('勤工助学能赚多少钱？')">勤工助学能赚多少钱？</div>
+      </div>
+      <div class="faq-category" onclick="toggleSub(this)">
+        <span class="faq-icon">!</span>
+        <span class="faq-name">防诈骗</span>
+        <span class="faq-count">4个问题</span>
+        <span class="faq-arrow">▸</span>
+      </div>
+      <div class="faq-sub">
+        <div class="faq-item" onclick="askFAQ('有人打电话说我中奖了是诈骗吗？')">中奖电话是诈骗吗？</div>
+        <div class="faq-item" onclick="askFAQ('有人冒充警察说我涉案了怎么办？')">冒充公检法诈骗</div>
+        <div class="faq-item" onclick="askFAQ('保健品诈骗是什么？')">保健品诈骗是什么？</div>
+        <div class="faq-item" onclick="askFAQ('遇到诈骗怎么办？')">遇到诈骗怎么办？</div>
+      </div>
+      <div class="faq-category" onclick="toggleSub(this)">
+        <span class="faq-icon">+</span>
+        <span class="faq-name">健康养生</span>
+        <span class="faq-count">4个问题</span>
+        <span class="faq-arrow">▸</span>
+      </div>
+      <div class="faq-sub">
+        <div class="faq-item" onclick="askFAQ('高血压平时要注意什么？')">高血压注意事项</div>
+        <div class="faq-item" onclick="askFAQ('糖尿病平时要注意什么？')">糖尿病注意事项</div>
+        <div class="faq-item" onclick="askFAQ('保健品能代替药品吗？')">保健品能代替药品吗？</div>
+        <div class="faq-item" onclick="askFAQ('老年人每年应该做什么检查？')">老年人每年体检建议</div>
+      </div>
+      <div class="faq-category" onclick="toggleSub(this)">
+        <span class="faq-icon">老</span>
+        <span class="faq-name">养老政策</span>
+        <span class="faq-count">4个问题</span>
+        <span class="faq-arrow">▸</span>
+      </div>
+      <div class="faq-sub">
+        <div class="faq-item" onclick="askFAQ('养老金怎么领？需要什么条件？')">养老金领取条件</div>
+        <div class="faq-item" onclick="askFAQ('养老金每月能领多少钱？')">养老金标准</div>
+        <div class="faq-item" onclick="askFAQ('高龄补贴怎么领？')">高龄补贴政策</div>
+        <div class="faq-item" onclick="askFAQ('社保卡丢了怎么办？')">社保卡挂失补办</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== API 配置弹窗 ===== -->
+<div class="api-modal" id="apiModal" onclick="if(event.target===this)toggleAPISettings()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:20px;color:#333;">API 设置</h3>
+      <button onclick="toggleAPISettings()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">×</button>
+    </div>
+
+    <!-- 平台选择 -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">选择平台</label>
+    <div id="platformOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+      <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🔥</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">豆包</div>
+        <div style="font-size:11px;color:#888;">50万+200万/天</div>
+      </div>
+      <div onclick="selectPlatform('zhipu')" data-platform="zhipu" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🧠</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">智谱AI</div>
+        <div style="font-size:11px;color:#4CAF50;">免费不限量</div>
+      </div>
+      <div onclick="selectPlatform('siliconflow')" data-platform="siliconflow" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">⚡</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">硅基流动</div>
+        <div style="font-size:11px;color:#888;">2000万Token</div>
+      </div>
+      <div onclick="selectPlatform('custom')" data-platform="custom" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #ddd;border-radius:10px;cursor:pointer;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;">
+        <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🔧</div>
+        <div style="font-size:13px;font-weight:600;color:#333;">自定义</div>
+        <div style="font-size:11px;color:#888;">OpenAI兼容</div>
+      </div>
+    </div>
+
+    <!-- API Key -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="输入 API Key" style="width:100%;padding:12px;border:2px solid #E8743C;border-radius:8px;font-size:16px;margin-bottom:12px;box-sizing:border-box;">
+
+    <!-- 自定义 API URL -->
+    <div id="apiUrlGroup" style="display:none;margin-bottom:12px;">
+      <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">API 地址</label>
+      <input type="text" id="apiUrlInput" placeholder="https://api.example.com/v1/chat/completions" style="width:100%;padding:12px;border:2px solid #E8743C;border-radius:8px;font-size:16px;box-sizing:border-box;">
+    </div>
+
+    <!-- 模型 ID -->
+    <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">模型 ID</label>
+    <input type="text" id="modelInput" placeholder="自动填充，可自定义" style="width:100%;padding:12px;border:2px solid #E8743C;border-radius:8px;font-size:16px;margin-bottom:16px;box-sizing:border-box;">
+
+    <!-- 平台说明 -->
+    <div id="platformTip" style="background:#FFF8E7;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#666;line-height:1.6;"></div>
+
+    <!-- 备选平台配置（可选） -->
+    <div style="border-top:1px dashed #ddd;padding-top:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <label style="font-size:14px;color:#333;font-weight:600;">备选平台（可选）</label>
+        <span style="font-size:11px;color:#888;background:#f0f0f0;padding:2px 6px;border-radius:4px;">主平台失败时自动切换</span>
+      </div>
+      <select id="backupPlatformSelect" onchange="onBackupPlatformChange()" style="width:100%;padding:10px;border:2px solid #E8743C;border-radius:8px;font-size:14px;margin-bottom:8px;box-sizing:border-box;">
+        <option value="">不启用备选</option>
+        <option value="zhipu">智谱AI（GLM-4-Flash 免费）</option>
+        <option value="doubao">豆包（火山引擎）</option>
+        <option value="siliconflow">硅基流动</option>
+      </select>
+      <input type="password" id="backupApiKeyInput" placeholder="备选平台 API Key" style="width:100%;padding:12px;border:2px solid #E8743C;border-radius:8px;font-size:16px;box-sizing:border-box;display:none;">
+    </div>
+
+    <!-- 按钮 -->
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveAPISettings()" style="flex:1;padding:12px;background:#E8743C;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">保存</button>
+      <button onclick="clearAPISettings()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:16px;cursor:pointer;">清除</button>
+    </div>
+    <p id="apiStatus" style="font-size:13px;color:#888;margin-top:12px;text-align:center;"></p>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== 回到底部按钮 ===== -->
+<button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="scrollToBottom()" title="回到底部">↓</button>
+
+<script>
+  // ===== 状态 =====
+  let currentMode = 'general';
+  let speechRate = 0.8;
+  let isRecording = false;
+  let recognition = null;
+
+  // ===== 三下乡故事折叠 =====
+  function toggleStory() {
+    const body = document.getElementById('storyBody');
+    const toggle = document.getElementById('storyToggle');
+    body.classList.toggle('show');
+    toggle.classList.toggle('open');
+  }
+
+  // ===== 回到底部 =====
+  function scrollToBottom() {
+    const conv = document.getElementById('conversation');
+    conv.scrollTo({ top: conv.scrollHeight, behavior: 'smooth' });
+  }
+  // 滚动监听：显示/隐藏回到底部按钮
+  (function() {
+    const conv = document.getElementById('conversation');
+    const btn = document.getElementById('scrollBottomBtn');
+    if (!conv || !btn) return;
+    conv.addEventListener('scroll', function() {
+      const isNearBottom = conv.scrollHeight - conv.scrollTop - conv.clientHeight < 120;
+      if (isNearBottom) {
+        btn.classList.remove('visible');
+      } else {
+        btn.classList.add('visible');
+      }
+    });
+  })();
+
+  // ===== 快捷提问 =====
+  function quickAsk(text) {
+    document.getElementById('textInput').value = text;
+    sendMessage();
+  }
+
+  // ===== 条件自测 =====
+  function startSelfTest() {
+    document.getElementById('textInput').value = '帮我看看能申请什么资助';
+    sendMessage();
+  }
+
+  // ===== 更新欢迎卡片（根据身份） =====
+  function updateWelcomeCard(mode) {
+    const title = document.getElementById('wcTitle');
+    const subtitle = document.getElementById('wcSubtitle');
+    const desc = document.getElementById('wcDesc');
+    const features = document.getElementById('wcFeatures');
+    const suggestions = document.getElementById('welcomeSuggestions');
+    const card = document.getElementById('welcomeCard');
+
+    const welcomeData = {
+      funding: {
+        title: '📚 您好！我是资助政策通',
+        subtitle: '专为学生和家长服务',
+        desc: '我熟悉国家和地方各类学生资助政策，助学贷款、助学金、奖学金都能问。您可以试试下面的功能：',
+        features: [
+          { icon: '💰', text: '<b>助学贷款</b> 额度·申请', action: 'ask', value: '助学贷款能贷多少钱？怎么申请？' },
+          { icon: '🎓', text: '<b>助学金</b> 条件·标准', action: 'ask', value: '国家助学金申请条件是什么？' },
+          { icon: '🏆', text: '<b>奖学金</b> 国奖·励志', action: 'ask', value: '国家奖学金多少钱？怎么评？' },
+          { icon: '📊', text: '<b>条件自测</b> 智能推荐', action: 'ask', value: '帮我看看能申请什么资助' }
+        ],
+        questions: [
+          { text: '助学贷款能贷多少钱？怎么申请？', ask: '助学贷款能贷多少钱？怎么申请？', special: false },
+          { text: '国家助学金申请条件是什么？', ask: '国家助学金申请条件是什么？', special: false },
+          { text: '国家奖学金多少钱？怎么评？', ask: '国家奖学金多少钱？怎么评？', special: false },
+          { text: '生源地贷款和校园地贷款有什么区别？', ask: '生源地贷款和校园地贷款有什么区别？', special: false },
+          { text: '帮我看看能申请什么资助（条件自测）', ask: '帮我看看能申请什么资助', special: true }
+        ]
+      },
+      elderly: {
+        title: '🛡️ 您好！我是银龄小保',
+        subtitle: '专为老人家服务',
+        desc: '我能帮您识别诈骗电话、解答健康问题、查询养老政策，说话慢一点、字大一点，您慢慢看。试试下面的功能：',
+        features: [
+          { icon: '🚨', text: '<b>防诈骗</b> 识别骗局', action: 'ask', value: '有人打电话说我中奖了让交手续费是诈骗吗？' },
+          { icon: '❤️', text: '<b>高血压</b> 日常注意', action: 'ask', value: '高血压平时要注意什么？' },
+          { icon: '💰', text: '<b>养老金</b> 领取查询', action: 'ask', value: '养老金多少岁可以领？能领多少？' },
+          { icon: '💳', text: '<b>社保卡</b> 挂失补办', action: 'ask', value: '社保卡丢了怎么办？' }
+        ],
+        questions: [
+          { text: '有人打电话说我中奖了让交钱，是诈骗吗？', ask: '有人打电话说我中奖了让交手续费是诈骗吗？', special: false },
+          { text: '高血压平时要注意什么？能吃什么？', ask: '高血压平时要注意什么？', special: false },
+          { text: '养老金多少岁可以领？能领多少？', ask: '养老金多少岁可以领？能领多少？', special: false },
+          { text: '社保卡丢了怎么补办？', ask: '社保卡丢了怎么办？', special: false },
+          { text: '常见的养老诈骗有哪些？', ask: '常见的养老诈骗有哪些？怎么防范？', special: true }
+        ]
+      },
+      general: {
+        title: '👋 您好！我是惠家通',
+        subtitle: '乡村家庭智能服务助手',
+        desc: '一个 Agent，服务全家——点击下面选个身份开始吧，或直接点击推荐问题：',
+        features: [
+          { icon: '📚', text: '<b>学生</b> 资助政策', action: 'mode', value: 'funding' },
+          { icon: '🛡️', text: '<b>老人</b> 识别诈骗', action: 'mode', value: 'elderly' },
+          { icon: '🏥', text: '<b>全家</b> 健康养生', action: 'ask', value: '高血压日常注意事项' },
+          { icon: '👴', text: '<b>长辈</b> 养老政策', action: 'mode', value: 'elderly' }
+        ],
+        questions: [
+          { text: '助学贷款能贷多少钱？怎么申请？', ask: '助学贷款能贷多少钱？怎么申请？', special: false },
+          { text: '中奖让交手续费是诈骗吗？', ask: '有人打电话说我中奖了让交手续费是诈骗吗？', special: false },
+          { text: '高血压日常注意事项', ask: '高血压平时要注意什么？', special: false },
+          { text: '养老金多少岁可以领？', ask: '养老金多少岁可以领？能领多少？', special: false },
+          { text: '帮我看看能申请什么资助（条件自测）', ask: '帮我看看能申请什么资助', special: true }
+        ]
+      }
+    };
+
+    const data = welcomeData[mode] || welcomeData.general;
+
+    title.textContent = data.title;
+    subtitle.textContent = data.subtitle;
+    desc.textContent = data.desc;
+
+    // 切换卡片主题色
+    if (mode === 'elderly') {
+      card.classList.add('elderly');
+    } else {
+      card.classList.remove('elderly');
+    }
+
+    features.innerHTML = data.features.map((f, idx) => {
+      let onclick;
+      if (f.action === 'mode') {
+        const iconMap = { funding: '学', elderly: '老' };
+        const labelMap = { funding: '学生/家长', elderly: '老人家' };
+        const ic = iconMap[f.value] || '?';
+        const lb = labelMap[f.value] || '随便问问';
+        onclick = `onclick="switchModeFromFeature('${f.value}','${ic}','${lb}')"`;
+      } else {
+        onclick = `onclick="quickAsk('${f.value.replace(/'/g, "\\'")}')"`;
+      }
+      return `<div class="wc-feat-item" ${onclick}>
+        <span class="wc-feat-icon">${f.icon}</span>
+        <span class="wc-feat-text">${f.text}</span>
+      </div>`;
+    }).join('');
+
+    suggestions.innerHTML = data.questions.map((q, i) =>
+      `<div class="sq-item" onclick="quickAsk('${q.ask}')">
+        <span class="sq-num" ${q.special ? 'style="background:linear-gradient(135deg,#E8743C,#C85A28);color:#fff;"' : ''}>${q.special ? '★' : (i+1)}</span>
+        <span class="sq-text" ${q.special ? 'style="font-weight:600;color:#A84820;"' : ''}>${q.text}</span>
+        <span class="sq-arrow">›</span>
+      </div>`
+    ).join('');
+  }
+
+  // ===== 从欢迎卡片功能按钮切换模式 =====
+  function switchModeFromFeature(mode, icon, label) {
+    currentMode = mode;
+    document.getElementById('identityIcon').textContent = icon;
+    document.getElementById('identityLabel').textContent = label;
+    document.querySelectorAll('.identity-option').forEach(o => o.classList.remove('active'));
+
+    let modeLabel = mode === 'funding' ? '学 资助政策通' : mode === 'elderly' ? '老 银龄小保' : '? 随便问问';
+    const badge = document.getElementById('modeBadge');
+    badge.textContent = modeLabel;
+    badge.classList.remove('pop');
+    void badge.offsetWidth;
+    badge.classList.add('pop');
+
+    const container = document.querySelector('.container');
+    container.className = 'container ' + mode + '-mode';
+
+    updateWelcomeCard(mode);
+    showToast('已切换到' + label + '模式');
+  }
+
+  // ===== 身份选择 =====
+  function toggleIdentity() {
+    document.getElementById('identityDropdown').classList.toggle('show');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.identity-select')) {
+      document.getElementById('identityDropdown').classList.remove('show');
+    }
+  });
+
+  function selectIdentity(mode, icon, label) {
+    currentMode = mode;
+    document.getElementById('identityIcon').textContent = icon;
+    document.getElementById('identityLabel').textContent = label;
+    document.querySelectorAll('.identity-option').forEach(o => o.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    let modeLabel = mode === 'funding' ? '学 资助政策通' : mode === 'elderly' ? '老 银龄小保' : '? 随便问问';
+    const badge = document.getElementById('modeBadge');
+    badge.textContent = modeLabel;
+    badge.classList.remove('pop');
+    void badge.offsetWidth;
+    badge.classList.add('pop');
+
+    // 容器模式颜色
+    const container = document.querySelector('.container');
+    container.className = 'container ' + mode + '-mode';
+
+    // 更新欢迎卡片
+    updateWelcomeCard(mode);
+
+    document.getElementById('identityDropdown').classList.remove('show');
+    showToast('已切换到' + label + '模式');
+  }
+
+  // ===== 发送消息 =====
+  async function sendMessage() {
+    const input = document.getElementById('textInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMessage(text, 'user');
+    showLoading();
+    try {
+      const reply = await getAgentReply(text, currentMode);
+      removeLoading();
+      addMessage(reply, 'agent');
+    } catch (e) {
+      removeLoading();
+      addMessage('抱歉，我暂时无法回答，请稍后再试。', 'agent');
+    }
+  }
+
+  // ===== 清空对话 =====
+  function clearChat() {
+    if (!confirm('确定要清空所有对话吗？')) return;
+    const conv = document.getElementById('conversation');
+    // 保留欢迎卡片、故事卡片、快捷操作卡片
+    const toRemove = conv.querySelectorAll('.message-row');
+    toRemove.forEach(el => el.remove());
+    showToast('对话已清空');
+  }
+
+  // ===== 多平台 API 配置 =====
+  const PLATFORMS = {
+    doubao: {
+      name: '豆包（火山引擎）',
+      apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+      defaultModel: 'doubao-3-5-32k-250428',
+      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
+    },
+    zhipu: {
+      name: '智谱AI（GLM）',
+      apiUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+      defaultModel: 'glm-4-flash',
+      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
+    },
+    siliconflow: {
+      name: '硅基流动',
+      apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+      defaultModel: 'deepseek-ai/DeepSeek-V3',
+      tip: '⚡ <b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
+    },
+    custom: {
+      name: '自定义平台',
+      apiUrl: '',
+      defaultModel: '',
+      tip: '🔧 <b>自定义 OpenAI 兼容 API</b><br>• 支持任何 OpenAI 格式的 API<br>• 填写完整的 API 地址和模型 ID<br>• 例如：通义千问、Kimi、DeepSeek 等'
+    }
+  };
+
+  function getApiUrl() {
+    const platform = localStorage.getItem('llm_platform') || 'doubao';
+    if (platform === 'custom') {
+      return localStorage.getItem('llm_api_url') || '';
+    }
+    return PLATFORMS[platform]?.apiUrl || PLATFORMS.doubao.apiUrl;
+  }
+
+  function getModel() {
+    return localStorage.getItem('llm_model') || PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel || 'doubao-3-5-32k-250428';
+  }
+
+  // ===== 知识库内容（嵌入前端，作为 system prompt 上下文） =====
+  const KB_FUNDING = `【资助政策库】
+一、国家助学贷款
+- 本专科生最高20000元/年，研究生最高25000元/年（以当年官方政策为准）
+- 贷款期限：学制+15年，最长22年
+- 利率：LPR5Y-70个基点（约2.8%），每年调整
+- 贴息：在校期间国家全额贴息，毕业后5年还本宽限期（只还利息），第6年起还本息
+- 申请时间：每年7月15日-9月30日
+- 申请渠道：国家开发银行学生在线系统 sls.cdb.com.cn 或国家助学贷款APP
+- 所需材料：录取通知书/学生证、身份证、户口本、共同借款人身份证
+- 共同借款人：原则上为父母，年龄25-60周岁，户籍须与学生在同一县
+- 还款方式：平安口袋银行APP、银联云闪付APP
+- 生源地贷款在县教育局办，校园地贷款在学校办
+
+二、国家助学金
+- 平均3700元/年，分档发放（2500/3700/5000元三档，高校自主确定）
+- 申请时间：每年9-10月入学后向学校申请
+- 须通过家庭经济困难学生认定
+- 按月发放
+- 全日制在校退役士兵学生全部享受，资助标准3700元/年
+
+三、国家奖学金/励志奖学金
+- 国家奖学金：本专科生10000元/年（每年奖励12万名），研究生硕士20000元/年、博士30000元/年
+- 国家励志奖学金：6000元/年，奖励品学兼优的家庭经济困难学生
+- 申请时间：每年9-10月
+
+四、绿色通道
+- 高校为家庭经济困难新生设立的"先报到后缴费"通道
+- 确保不因学费问题失学
+
+五、勤工助学
+- 校内工作岗位，每月约300-800元
+- 不影响学习时间
+
+六、义务教育阶段
+- 两免一补：免学杂费、免课本费、补助寄宿生生活费
+- 家庭经济困难学生生活费补助
+- 农村义务教育学生营养改善计划
+- 开学后30日内向学校申请`;
+
+  const KB_ELDERLY = `【银龄关怀库】
+一、防诈骗指南
+- 常见诈骗类型：中奖诈骗、冒充公检法、保健品诈骗、养老投资骗局、冒充亲属、冒充客服
+- 诈骗特征：要求转账、索要验证码、声称中奖需交手续费、要求转到"安全账户"、冒充公检法
+- 防骗"五要"原则：要看资质、要抵诱惑、要拒代办、要拒保健品、要多沟通
+- 遇到诈骗：挂断电话→联系子女/村干部→拨打110
+- 反诈专线：96110
+
+二、健康科普
+- 高血压：每天盐不超过5克、每天散步30分钟、按时吃药不要自己停药、定期测血压
+- 糖尿病：少糖少油、每餐米饭不超一碗、定期测血糖、随身带糖果防低血糖
+- 保健品不能代替药品，不舒服要去正规医院
+
+三、养老政策
+- 养老金领取条件：年满60周岁、累计缴费满15年
+- 2026年全国基础养老金最低标准：163元/月
+- 广东省基础养老金标准：约240元/月
+- 高龄津贴：一般70岁以上开始发放，分四档
+- 社保咨询热线：12333
+- 社保卡丢失：拨打12333挂失，带身份证到社保局补办`;
+
+  // ===== Agent API 调用 =====
+  async function getAgentReply(text, mode) {
+    // 1. 优先尝试主平台 API
+    const apiKey = localStorage.getItem('llm_api_key');
+    const platform = localStorage.getItem('llm_platform') || 'doubao';
+    if (apiKey) {
+      try {
+        const reply = await callLLMAPI(text, mode, apiKey, platform);
+        return reply;
+      } catch (e) {
+        console.warn('主平台API调用失败:', e.message);
+        // 2. 尝试备选平台 API
+        const backupKey = localStorage.getItem('llm_backup_key');
+        const backupPlatform = localStorage.getItem('llm_backup_platform');
+        if (backupKey && backupPlatform && backupPlatform !== platform) {
+          try {
+            showToast('主平台失败，切换到备选平台...');
+            const reply = await callLLMAPI(text, mode, backupKey, backupPlatform);
+            return reply;
+          } catch (e2) {
+            console.warn('备选平台API调用失败:', e2.message);
+          }
+        }
+        showToast('API调用失败，使用本地回复');
+      }
+    }
+
+    // 3. 尝试本地后端 API（如果部署了后端服务）
+    const apiUrls = [
+      '/api/chat',
+      'http://localhost:8080/api/chat',
+      'http://127.0.0.1:8080/api/chat'
+    ];
+    for (const url of apiUrls) {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, mode: mode, user_id: 'web-user' })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return data.reply || data.message || data.response;
+        }
+      } catch (e) {}
+    }
+
+    // 4. 回退到本地模拟回复
+    return simulateReply(text, mode);
+  }
+
+  // ===== 通用大模型 API 调用（支持多平台） =====
+  async function callLLMAPI(text, mode, apiKey, platform) {
+    platform = platform || localStorage.getItem('llm_platform') || 'doubao';
+    // 根据模式选择知识库和 system prompt
+    let systemPrompt = '';
+    let kbContent = '';
+
+    if (mode === 'funding') {
+      systemPrompt = `你是一个学生资助政策专家，名叫"惠家通"。当前模式：资助政策咨询。
+
+【行为规范】
+1. 始终基于知识库回答，不要编造政策
+2. 回答要通俗易懂，用"大白话"解释专业术语
+3. 涉及金额时标注"以当年官方政策为准"
+4. 涉及诈骗类问题，先警示再解答
+5. 不知道的问题引导用户联系学校资助中心或拨打010-66097980
+
+【输出格式】
+- 简洁明了，分点列出
+- 重要信息用**加粗**
+- 每段不超过3行
+- 语音回答时语速适中
+
+【常见问题处理】
+1. "能申请什么" → 先问清楚对方身份（初中/高中/大学/家长），再针对性回答
+2. "怎么申请" → 分步列出流程，注明所需材料
+3. "能拿多少钱" → 给出标准范围，标注"以当年政策为准"
+4. "条件自测" → 让用户输入家庭年收入、在读人数等信息，综合推荐`;
+      kbContent = KB_FUNDING;
+    } else if (mode === 'elderly') {
+      systemPrompt = `你是"惠家通"银龄关怀助手，专为农村老年人服务。当前模式：银龄关怀。
+
+【行为规范】
+1. 语气亲切温暖，像家人一样关心
+2. 涉及诈骗问题，先警示再解答
+3. 健康问题只做科普，不代替医生诊断，提醒就医
+4. 养老政策标注"以当地政策为准"
+5. 用词简单易懂，避免专业术语
+
+【输出格式】
+- 简洁明了，分点列出
+- 重要信息用**加粗**
+- 每段不超过3行
+- 语速偏慢，适合老年人`;
+      kbContent = KB_ELDERLY;
+    } else {
+      systemPrompt = `你是"惠家通"，一个乡村家庭智能服务Agent。你可以回答资助政策、防诈骗、健康科普、养老政策等问题。请根据用户问题判断属于哪个领域，给出专业、通俗的回答。重要信息用**加粗**，分点列出。`;
+      kbContent = KB_FUNDING + '\n\n' + KB_ELDERLY;
+    }
+
+    // 获取平台配置
+    const config = PLATFORMS[platform];
+    if (!config) throw new Error('未知平台: ' + platform);
+
+    // 根据平台决定模型和 API URL
+    let apiUrl, model;
+    if (platform === 'custom') {
+      apiUrl = localStorage.getItem('llm_api_url') || '';
+      model = localStorage.getItem('llm_model') || '';
+    } else {
+      apiUrl = config.apiUrl;
+      // 主平台用 llm_model，备选用默认模型
+      model = (platform === (localStorage.getItem('llm_platform') || 'doubao'))
+        ? (localStorage.getItem('llm_model') || config.defaultModel)
+        : config.defaultModel;
+    }
+
+    if (!apiUrl) throw new Error('未配置 API 地址');
+    if (!model) throw new Error('未配置模型 ID');
+
+    const payload = {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt + '\n\n【知识库】\n' + kbContent },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.3,
+      max_tokens: 2048
+    };
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error('API错误: ' + res.status + ' ' + err);
+    }
+
+    const data = await res.json();
+    return data.choices[0].message.content;
+  }
+
+  // ===== 模拟回复（API 不可用时备用） =====
+  function simulateReply(text, mode) {
+    const t = text.trim();
+    // 资助政策类
+    if (t.includes('助学贷款') && t.includes('多少钱')) {
+      return '**全日制普通本专科学生**每人每年最高 **20000元**，**研究生**最高 **25000元**。\n\n以当年官方政策为准。';
+    }
+    if (t.includes('助学贷款') && t.includes('申请')) {
+      return '**生源地助学贷款申请流程（4步）：**\n\n**1.** 每年 **7月15日-9月30日** 到县教育局办理\n**2.** 携带材料：录取通知书、身份证、户口本、共同借款人身份证\n**3.** 现场签订借款合同，领取受理证明\n**4.** 入学后提交受理证明给高校\n\n> 国家资助热线：**010-66097980**';
+    }
+    if (t.includes('绿色通道')) {
+      return '**绿色通道**是高校为家庭经济困难新生设立的 **"先报到、后缴费"** 的入学通道。\n\n即使暂时无法缴纳学费和住宿费，也能先办理入学手续，确保**不因学费问题失学**。';
+    }
+    if (t.includes('奖学金') && t.includes('多少钱')) {
+      return '**国家奖学金**：**10000元/年**（本专科生），奖励特别优秀的全日制本专科生，每年奖励12万名，颁发国家统一印制的荣誉证书。\n\n**国家励志奖学金**：**6000元/年**，奖励品学兼优的家庭经济困难学生。\n\n以当年官方政策为准。';
+    }
+    if (t.includes('助学金') && t.includes('多少钱')) {
+      return '**国家助学金**平均资助标准为 **3700元/年**，分档发放（高校在2500-5000元范围内自主确定，可分为2-3档）。\n\n全日制在校退役士兵学生全部享受，资助标准为 **3700元/年**。\n\n申请时间：每年 **9-10月** 入学后向学校申请。\n发放方式：**按月发放**。\n\n以当年官方政策为准。';
+    }
+    if (t.includes('勤工助学')) {
+      return '**勤工助学**是学校为家庭经济困难学生提供的校内工作岗位。\n\n- 每月约 **300-800元**\n- 岗位类型：图书馆助理、实验室助理、行政助理等\n- 不影响学习时间\n\n入学后可向学校资助中心申请。';
+    }
+    if (t.includes('自测') || t.includes('能申请什么') || t.includes('年收入') || t.includes('申请什么资助') || t.includes('条件自测') || t.includes('推荐') || t.includes('家庭情况')) {
+      // 如果已经包含了具体的收入和家庭信息，直接推荐
+      if (/(\d+)\s*万/.test(t) && (t.includes('孩子') || t.includes('上学') || t.includes('在读') || t.includes('大学') || t.includes('高中') || t.includes('初中') || t.includes('小学') || t.includes('家庭'))) {
+        const income = t.match(/(\d+)\s*万/)[1];
+        // 识别孩子数量：支持 五个/3个/两个孩子/一个
+        let cnt = 1;
+        const numMap = { '一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 };
+        // 匹配"X个孩子""X个小孩"
+        const cnMatch = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个(?:孩子|小孩)'));
+        const numMatch = t.match(/(\d+)个(?:孩子|小孩)/);
+        // 匹配"两个孩子""一个孩子"等简写
+        const cnSimple = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个(?:孩子|小孩)?$'));
+        if (cnMatch) cnt = numMap[cnMatch[0][0]];
+        else if (numMatch) cnt = parseInt(numMatch[1]);
+        else if (t.includes('两个孩子') || t.includes('两个小孩')) cnt = 2;
+        else if (t.includes('一个孩子') || t.includes('一个小孩') || t.includes('1个孩子')) cnt = 1;
+        // 如果以上都没匹配到，尝试数孩子总数：数"个"出现的次数
+        else {
+          const levelMatch = t.match(/\d+个/g);
+          if (levelMatch) {
+            cnt = levelMatch.reduce((sum, m) => sum + parseInt(m), 0);
+          }
+        }
+
+        // 统计各学段人数
+        let uniCnt = 0, highCnt = 0, midCnt = 0, priCnt = 0;
+        // 解析 "两个大学" "1个大学" "大学生"
+        const uniMatch1 = t.match(/(\d+)个大学/);
+        const uniMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个大学'));
+        if (uniMatch1) uniCnt = parseInt(uniMatch1[1]);
+        else if (uniMatch2) uniCnt = numMap[uniMatch2[0][0]];
+        else if (t.includes('大学生') || t.includes('上大学')) uniCnt = 1;
+        // 多个 "大学" 关键词
+        if (uniCnt === 0) {
+          const uniKeywords = (t.match(/大学/g) || []).length;
+          if (uniKeywords > 0) uniCnt = Math.max(uniKeywords, 1);
+        }
+
+        const highMatch1 = t.match(/(\d+)个高中/);
+        const highMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个高中'));
+        if (highMatch1) highCnt = parseInt(highMatch1[1]);
+        else if (highMatch2) highCnt = numMap[highMatch2[0][0]];
+        else if (t.includes('高中生')) highCnt = 1;
+
+        const midMatch1 = t.match(/(\d+)个初中/);
+        const midMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个初中'));
+        if (midMatch1) midCnt = parseInt(midMatch1[1]);
+        else if (midMatch2) midCnt = numMap[midMatch2[0][0]];
+
+        const priMatch1 = t.match(/(\d+)个小学/);
+        const priMatch2 = t.match(new RegExp('[' + Object.keys(numMap).join('') + ']个小学'));
+        if (priMatch1) priCnt = parseInt(priMatch1[1]);
+        else if (priMatch2) priCnt = numMap[priMatch2[0][0]];
+
+        // 组装学段详情
+        let detail = '';
+        const levelParts = [];
+        if (uniCnt > 0) levelParts.push(uniCnt + '个大学');
+        if (highCnt > 0) levelParts.push(highCnt + '个高中');
+        if (midCnt > 0) levelParts.push(midCnt + '个初中');
+        if (priCnt > 0) levelParts.push(priCnt + '个小学');
+        if (levelParts.length > 0) detail = '（其中' + levelParts.join('、') + '）';
+
+        // 生成推荐建议
+        let loanMsg = uniCnt > 0
+          ? '**' + uniCnt + '个大学生**每人每年可贷最高 **20000元**，合计最高 **' + (uniCnt * 20000) + '元/年**'
+          : '上大学后可申请，最高 **20000元/年**';
+        let grantMsg = uniCnt > 0
+          ? uniCnt + '个大学生入学后可申请，平均 **3700元/年/人**，合计约 **' + (uniCnt * 3700) + '元/年**'
+          : '上大学后入学即可申请，平均 **3700元/年**';
+        let grantDetail = uniCnt > 0
+          ? '\n- 按月发放，9-10月向学校申请'
+          : '，按月发放';
+        let subDetail = '';
+        if (uniCnt > 0) subDetail += '\n- 读书期间国家全额贴息，毕业后5年还本宽限期\n- 申请时间：**7月15日-9月30日**，县教育局办理\n- 所需材料：录取通知书/学生证、身份证、户口本、共同借款人身份证';
+
+        // 义务教育阶段资助
+        let eduSection = '';
+        if (midCnt > 0 || priCnt > 0) {
+          let eduChildren = [];
+          if (midCnt > 0) eduChildren.push(midCnt + '个初中');
+          if (priCnt > 0) eduChildren.push(priCnt + '个小学');
+          eduSection = '\n\n**5. 义务教育阶段资助**\n- ' + eduChildren.join('和') + '的孩子可享受 **"两免一补"**（免学杂费、免课本费、补助寄宿生生活费）\n- 具体标准以当地政策为准';
+        }
+
+        // 预估金额表格
+        let totalLoan = uniCnt * 20000;
+        let totalGrant = uniCnt * 3700;
+        let totalWork = uniCnt * 300 * 12 + '~' + (uniCnt * 800 * 12);
+        let table = '\n\n### 预估年度资助总额\n\n| 项目 | 金额（以当年政策为准） |\n|:-----|:-----|\n| 助学贷款（' + uniCnt + '人） | 最高 ' + totalLoan + '元 |\n| 助学金（' + uniCnt + '人） | 约 ' + totalGrant + '元 |\n| 勤工助学（' + uniCnt + '人） | 约 ' + totalWork + '元 |\n| 义务教育补助 | 按当地标准 |';
+
+        let reminder = '\n\n> **关键提醒**：年收入' + income + '万供' + cnt + '个孩子读书，压力确实大。**7-9月**先办助学贷款，**9-10月**入学后办助学金，两个时间不冲突。\n\n需要我列出详细的**申请时间表和材料清单**吗？';
+
+        return '**根据您的情况（年收入' + income + '万元、' + cnt + '个孩子' + detail + '），为您推荐以下资助项目：**\n\n---\n\n### 推荐方案（按优先级排序）\n\n**1. 生源地信用助学贷款**（最优先）\n' + loanMsg + subDetail + '\n\n**2. 国家助学金**\n- ' + grantMsg + grantDetail + '\n\n**3. 绿色通道**\n- 大学生报到当天没带够学费，可**先入学后缴费**\n\n**4. 勤工助学**\n- ' + uniCnt + '个大学生可申请校内岗位，每月约 **300-800元/人**' + eduSection + table + reminder;
+      }
+      return '好的，我来帮您做条件自测！\n\n请告诉我以下信息：\n**①** 家庭年收入（万元）\n**②** 家里有几个孩子在上学\n**③** 最高学历阶段（初中/高中/大学/大专）\n**④** 是否有特殊困难（残疾/重病/低保等）\n\n您可以直接告诉我，比如："年收入3万，两个孩子，一个高中一个大学"';
+    }
+
+    // 防诈骗类
+    if (t.includes('中奖') && (t.includes('电话') || t.includes('诈骗'))) {
+      return '⚠️ **重要提醒：这是诈骗！**\n\n**特征分析：**\n❌ 声称中奖 — 正规中奖不需要提前交钱\n❌ 要求交手续费 — 典型骗局\n\n✅ **正确做法：**\n• 不要转账，不提供验证码\n• 挂断电话，不要回拨\n• 联系村干部或拨打 **110**\n\n> 📌 记住：**凡是让您先交钱才能领奖的，都是诈骗！**';
+    }
+    if (t.includes('冒充') && (t.includes('警察') || t.includes('公检法'))) {
+      return '⚠️ **重要提醒：这是冒充公检法诈骗！**\n\n**套路分析：**\n❌ 骗子冒充警察/法官，说您涉嫌犯罪\n❌ 要求您转账到"安全账户"验证资金\n\n✅ **正确做法：**\n• **挂断电话**，公安机关不会电话办案\n• **不要转账**，没有"安全账户"这回事\n• 拨打 **110** 核实\n\n> 📌 公检法机关不会通过电话要求转账！';
+    }
+    if (t.includes('保健品诈骗') || (t.includes('保健品') && t.includes('诈骗'))) {
+      return '⚠️ **保健品诈骗常见套路：**\n\n**1. 免费诱饵：** 免费体检、免费讲座、免费领鸡蛋\n**2. 情感陪护：** 亲切喊"爸妈"，关心您的身体\n**3. 夸大病情：** 说您身体有大问题，制造恐慌\n**4. 高价推销：** 卖出比成本高几十倍的"保健品"\n\n✅ **防骗要点：**\n• 保健品**不能治病**\n• 认准"蓝帽子"标志\n• 买药去正规药店\n• 不舒服要去正规医院';
+    }
+    if (t.includes('遇到诈骗') || (t.includes('诈骗') && t.includes('怎么办'))) {
+      return '🚨 **遇到诈骗怎么办？**\n\n**四步处理：**\n**1. 停止** — 立刻停止操作，不要转账\n**2. 挂断** — 挂断电话，不要回拨\n**3. 联系** — 联系子女/村干部/拨打 **110**\n**4. 报警** — 保存证据，立即报警\n\n📞 **重要电话：**\n• 报警：**110**\n• 反诈专线：**96110**\n• 国家反诈中心APP：开启来电预警';
+    }
+
+    // 健康科普类
+    if (t.includes('高血压') || t.includes('血压高')) {
+      return '❤️ **高血压日常注意事项：**\n\n🥗 **饮食：**\n• 少吃盐，每天不超过 **5克**（一啤酒瓶盖）\n• 多吃蔬菜水果，少吃肥肉\n\n🏃 **运动：**\n• 每天散步 **30分钟**\n• 控制体重\n\n💊 **用药：**\n• **按时吃药**，不要自己停药\n• 坐姿站起时动作要慢\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
+    }
+    if (t.includes('糖尿病')) {
+      return '🩸 **糖尿病日常注意事项：**\n\n🥗 **饮食：**\n• 少糖少油少盐\n• 每餐米饭不超过一碗\n• 水果选低糖的\n\n🏃 **运动：**\n• 每周运动5-7次，每次30-60分钟\n• 散步、快走即可\n\n💊 **监测：**\n• 定期测血糖\n• 随身带**糖果饼干**，防低血糖\n\n> 📌 我是科普助手，不能代替医生，不舒服请及时就医。';
+    }
+    if (t.includes('保健品') && t.includes('药品')) {
+      return '💊 **保健品不能代替药品！**\n\n• 保健品是**食品**，不是药品\n• 保健品**不能治病**\n• 身体不舒服要去**正规医院**\n• 买药要去**正规药店**\n\n记住：**"包治百病"的都是骗人的！**';
+    }
+    if (t.includes('体检') || t.includes('检查')) {
+      return '🏥 **老年人每年建议检查项目：**\n\n**1.** 血压测量\n**2.** 血糖检测\n**3.** 血脂检查\n**4.** 心电图\n**5.** 视力/听力检查\n\n建议每年至少体检一次，到乡镇卫生院或村卫生室即可。';
+    }
+
+    // 养老政策类
+    if (t.includes('养老金') && (t.includes('条件') || t.includes('怎么领') || t.includes('领取'))) {
+      return '💰 **养老金领取条件：**\n\n• 年满 **60周岁**\n• 累计缴费满 **15年**\n• 男女退休年龄均为60岁\n\n**办理流程：**\n提前1-3个月到户籍地社保机构申请\n\n> 📞 社保热线：**12333**';
+    }
+    if (t.includes('养老金') && (t.includes('多少钱') || t.includes('标准') || t.includes('每月'))) {
+      return '📊 **2026年养老金标准：**\n\n**全国最低标准：163元/月**\n• 广东省：约 **240元/月**\n• 深圳市：更高标准\n\n**养老金 = 基础养老金 + 个人账户养老金**\n多缴多得，长缴多得。\n\n65岁以上老人还有额外高龄补贴。';
+    }
+    if (t.includes('高龄补贴')) {
+      return '🎁 **高龄补贴政策（各地不同）：**\n\n一般 **70岁以上** 开始发放：\n• 70-79岁：各地标准不等\n• 80-89岁：每月30-60元\n• 90-99岁：每月50-150元\n• 100岁以上：每月最高1000元\n\n> 📞 详情咨询：**12333** 社保热线';
+    }
+    if (t.includes('社保卡') && (t.includes('丢') || t.includes('挂失') || t.includes('补办'))) {
+      return '💳 **社保卡丢失怎么办？**\n\n**1. 立即挂失：** 拨打 **12333** 口头挂失\n**2. 正式补办：** 带身份证到社保局或银行网点办理\n**3. 激活：** 新卡需到银行激活金融功能\n\n> 📌 社保卡兼具医保和金融功能，丢失后请尽快挂失！';
+    }
+
+    // 默认回复
+    if (mode === 'funding') {
+      return '好的，已收到您关于资助政策的问题。\n\n您可以尝试问我：\n• "助学贷款能贷多少钱？"\n• "助学贷款怎么申请？"\n• "国家助学金多少钱？"\n• "帮我看看能申请什么资助？"';
+    }
+    if (mode === 'elderly') {
+      return '好的，已收到您的问题。\n\n您可以尝试问我：\n• "有人打电话说我中奖了是诈骗吗？"\n• "高血压平时要注意什么？"\n• "养老金怎么领？"';
+    }
+    return '您好！我是惠家通，您的乡村家庭智能服务助手。\n\n请选择右上角的身份，或直接问我：\n📚 **资助政策** — 助学贷款、助学金等\n🛡️ **防诈骗** — 识别诈骗电话\n🏥 **健康科普** — 高血压、糖尿病\n👴 **养老政策** — 养老金、高龄补贴';
+  }
+
+  // ===== 添加消息 =====
+  function addMessage(text, role) {
+    const conv = document.getElementById('conversation');
+    const row = document.createElement('div');
+    row.className = 'message-row ' + role;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar ' + role;
+    avatar.textContent = role === 'agent' ? '惠' : '我';
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + role;
+    // 将 **加粗** 转为 <strong>，将 \n 转为 <br>
+    let html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\n/g, '<br>');
+    bubble.innerHTML = html;
+
+    content.appendChild(bubble);
+
+    // 时间戳
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    const now = new Date();
+    time.textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    content.appendChild(time);
+
+    // Agent消息自动朗读
+    if (role === 'agent') {
+      // 语音控制：朗读后附加暂停按钮
+      setTimeout(() => speakText(bubble.textContent), 300);
+
+      const actions = document.createElement('div');
+      actions.className = 'message-actions';
+      actions.innerHTML = '<button class="action-btn" onclick="replayMsg(this)">🔊 重听</button><button class="action-btn" onclick="copyMsg(this)">📋 复制</button><button class="action-btn" onclick="forwardMsg(this)">↗ 转发</button>';
+      content.appendChild(actions);
+    } else {
+      // 用户消息也加操作按钮
+      const actions = document.createElement('div');
+      actions.className = 'message-actions';
+      actions.style.justifyContent = 'flex-end';
+      actions.innerHTML = '<button class="action-btn" onclick="copyMsg(this)">📋 复制</button>';
+      content.appendChild(actions);
+    }
+
+    row.appendChild(role === 'agent' ? avatar : content);
+    row.appendChild(role === 'agent' ? content : avatar);
+    conv.appendChild(row);
+    conv.scrollTop = conv.scrollHeight;
+  }
+
+  // ===== Loading =====
+  function showLoading() {
+    const conv = document.getElementById('conversation');
+    const row = document.createElement('div');
+    row.className = 'message-row';
+    row.id = 'loadingRow';
+    row.innerHTML = '<div class="avatar agent">惠</div><div class="message-content"><div class="bubble agent loading-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+    conv.appendChild(row);
+    conv.scrollTop = conv.scrollHeight;
+  }
+  function removeLoading() {
+    const el = document.getElementById('loadingRow');
+    if (el) el.remove();
+  }
+
+  // ===== 语音控制 =====
+  let currentUtter = null;
+  let isSpeaking = false;
+  let keepAliveTimer = null;
+
+  // 预加载 voices（Chrome 异步加载）
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function() {
+      window.speechSynthesis.getVoices();
+    };
+  }
+
+  // Chrome 长文本 bug 修复：每 10 秒 resume 一次，防止自动暂停
+  function startKeepAlive() {
+    stopKeepAlive();
+    keepAliveTimer = setInterval(function() {
+      if (!isSpeaking) return;
+      try {
+        // 仅在 paused 时 resume，避免打断正常播放
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      } catch(e) {}
+    }, 10000);
+  }
+  function stopKeepAlive() {
+    if (keepAliveTimer) {
+      clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
+  }
+
+  function speakText(text) {
+    if (!('speechSynthesis' in window)) {
+      showToast('当前浏览器不支持语音播放');
+      return;
+    }
+    // 清理：先 cancel 并等待一帧，避免触发自身 onend
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+    stopKeepAlive();
+    if (currentUtter) currentUtter = null;
+
+    const cleanText = (text || '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) {
+      showToast('没有可朗读的内容');
+      return;
+    }
+
+    const utter = new SpeechSynthesisUtterance(cleanText);
+    utter.lang = 'zh-CN';
+    utter.rate = speechRate || 0.9;
+    utter.volume = 1;
+    utter.pitch = 1;
+
+    // 优先选择中文女声
+    const voices = window.speechSynthesis.getVoices() || [];
+    const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting|yaoyao|kangkang/i.test(v.name))
+                 || voices.find(v => v.lang === 'zh-CN')
+                 || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
+    if (zhVoice) utter.voice = zhVoice;
+
+    currentUtter = utter;
+    isSpeaking = true;
+    isPaused = false;
+    const stopBtn = document.getElementById('stopBtn');
+    if (stopBtn) {
+      stopBtn.style.display = 'flex';
+      updateStopBtnUI('playing');
+    }
+
+    utter.onend = function() {
+      isSpeaking = false;
+      isPaused = false;
+      stopKeepAlive();
+      const sb = document.getElementById('stopBtn');
+      if (sb) sb.style.display = 'none';
+    };
+    utter.onerror = function(e) {
+      console.warn('语音播放错误:', e);
+      isSpeaking = false;
+      isPaused = false;
+      stopKeepAlive();
+      const sb = document.getElementById('stopBtn');
+      if (sb) sb.style.display = 'none';
+      // 错误时给用户清晰提示
+      if (e && e.error === 'not-allowed') {
+        showToast('请点击页面任意位置后重试（浏览器需要授权语音）');
+      } else {
+        showToast('语音播放失败，请检查浏览器设置');
+      }
+    };
+
+    // 真正发起播放（保持异步，兼容 iOS Safari）
+    setTimeout(function() {
+      try {
+        window.speechSynthesis.speak(utter);
+        startKeepAlive();
+      } catch(err) {
+        console.error('speak 调用异常:', err);
+        showToast('语音播放失败：' + (err.message || '未知错误'));
+        isSpeaking = false;
+        const sb = document.getElementById('stopBtn');
+        if (sb) sb.style.display = 'none';
+      }
+    }, 50);
+  }
+
+  // 暂停/继续/停止 三态控制
+  // isSpeaking: 是否在播放（包括暂停状态）
+  // isPaused: 是否当前处于暂停状态
+  let isPaused = false;
+
+  function togglePauseSpeech() {
+    if (!('speechSynthesis' in window)) return;
+    if (!isSpeaking) return;
+    if (isPaused) {
+      // 继续
+      try {
+        window.speechSynthesis.resume();
+        isPaused = false;
+        updateStopBtnUI('playing');
+      } catch(e) { console.warn('resume 失败:', e); }
+    } else {
+      // 暂停
+      try {
+        window.speechSynthesis.pause();
+        isPaused = true;
+        updateStopBtnUI('paused');
+      } catch(e) { console.warn('pause 失败:', e); }
+    }
+  }
+
+  function updateStopBtnUI(state) {
+    const icon = document.getElementById('stopBtnIcon');
+    const text = document.getElementById('stopBtnText');
+    if (!icon || !text) return;
+    if (state === 'playing') {
+      icon.textContent = '⏸';
+      text.textContent = '暂停';
+    } else if (state === 'paused') {
+      icon.textContent = '▶';
+      text.textContent = '继续';
+    }
+  }
+
+  function stopSpeech() {
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+    isSpeaking = false;
+    isPaused = false;
+    stopKeepAlive();
+    const stopBtn = document.getElementById('stopBtn');
+    if (stopBtn) stopBtn.style.display = 'none';
+  }
+
+  // ===== 重听 =====
+  function replayMsg(btn) {
+    const bubble = btn.closest('.message-content').querySelector('.bubble');
+    if (bubble) speakText(bubble.textContent);
+  }
+
+  // ===== 转发 =====
+  function forwardMsg(btn) {
+    const bubble = btn.closest('.message-content').querySelector('.bubble');
+    if (bubble && navigator.clipboard) {
+      navigator.clipboard.writeText(bubble.textContent).then(() => showToast('已复制到剪贴板'));
+    } else {
+      showToast('转发功能需要手动复制');
+    }
+  }
+
+  // ===== 复制消息 =====
+  function copyMsg(btn) {
+    const bubble = btn.closest('.message-content').querySelector('.bubble');
+    if (!bubble) return;
+    const text = bubble.textContent;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => showToast('📋 已复制'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('📋 已复制'); } catch(e) { showToast('复制失败'); }
+      ta.remove();
+    }
+  }
+
+  // ===== 语速 =====
+  function setSpeed(rate, el) {
+    speechRate = rate;
+    document.querySelectorAll('.speed-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ===== 语音识别 =====
+  function toggleRecording() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      showToast('当前浏览器不支持语音输入，请使用Chrome浏览器');
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!recognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'zh-CN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onresult = function(e) {
+        const text = e.results[0][0].transcript;
+        document.getElementById('textInput').value = text;
+        document.getElementById('micBtn').classList.remove('recording');
+        isRecording = false;
+        sendMessage();
+      };
+      recognition.onerror = function() {
+        document.getElementById('micBtn').classList.remove('recording');
+        isRecording = false;
+        showToast('语音识别失败，请重试');
+      };
+    }
+    if (isRecording) {
+      recognition.stop();
+      document.getElementById('micBtn').classList.remove('recording');
+      isRecording = false;
+    } else {
+      recognition.start();
+      document.getElementById('micBtn').classList.add('recording');
+      isRecording = true;
+      showToast('录音中，请说话...');
+    }
+  }
+
+  // ===== 悬浮按钮自动隐藏 =====
+  let fabTimer = null;
+  function showFabs() {
+    const fabs = document.querySelectorAll('.api-fab, .faq-fab');
+    fabs.forEach(el => el.classList.add('visible'));
+  }
+  function hideFabs() {
+    const fabs = document.querySelectorAll('.api-fab, .faq-fab');
+    fabs.forEach(el => el.classList.remove('visible'));
+  }
+  function triggerFabs() {
+    showFabs();
+    clearTimeout(fabTimer);
+    fabTimer = setTimeout(hideFabs, 2000);
+  }
+  // 页面加载1秒后自动隐藏
+  setTimeout(hideFabs, 1000);
+  // 首次加载后显示1.5秒让用户知道有按钮
+  showFabs();
+  // 对话区滚动时显示
+  const convEl = document.getElementById('conversation');
+  if (convEl) {
+    convEl.addEventListener('scroll', triggerFabs, { passive: true });
+  }
+  // 输入框聚焦/输入时显示
+  const textInput = document.getElementById('textInput');
+  if (textInput) {
+    textInput.addEventListener('focus', triggerFabs);
+    textInput.addEventListener('input', triggerFabs);
+  }
+  // 鼠标移动到右侧区域时显示
+  document.addEventListener('mousemove', function(e) {
+    const w = window.innerWidth;
+    if (e.clientX > w - 80) {
+      triggerFabs();
+    }
+  });
+  // 点击页面任何位置触发一次
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.api-fab') && !e.target.closest('.faq-fab') && !e.target.closest('.api-modal') && !e.target.closest('.faq-modal')) {
+      triggerFabs();
+    }
+  });
+  // 移动端：触摸屏幕右侧显示
+  document.addEventListener('touchstart', function(e) {
+    const touch = e.touches[0];
+    if (touch && touch.clientX > window.innerWidth - 100) {
+      triggerFabs();
+    }
+  });
+
+  // ===== FAQ =====
+  function toggleFAQ() {
+    document.getElementById('faqModal').classList.toggle('show');
+  }
+
+  function toggleSub(el) {
+    const sub = el.nextElementSibling;
+    if (sub && sub.classList.contains('faq-sub')) {
+      sub.classList.toggle('show');
+      const arrow = el.querySelector('.faq-arrow');
+      if (arrow) arrow.textContent = sub.classList.contains('show') ? '▾' : '▸';
+    }
+  }
+
+  function askFAQ(text) {
+    document.getElementById('faqModal').classList.remove('show');
+    document.getElementById('textInput').value = text;
+    sendMessage();
+  }
+
+  // ===== Toast =====
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  // ===== API 设置 =====
+  let selectedPlatform = 'doubao';
+
+  function toggleAPISettings() {
+    const modal = document.getElementById('apiModal');
+    const isHidden = modal.style.display === 'none';
+    modal.style.display = isHidden ? 'flex' : 'none';
+    if (isHidden) {
+      selectedPlatform = localStorage.getItem('llm_platform') || 'doubao';
+      selectPlatform(selectedPlatform);
+      const savedKey = localStorage.getItem('llm_api_key') || '';
+      const savedModel = localStorage.getItem('llm_model') || '';
+      const savedUrl = localStorage.getItem('llm_api_url') || '';
+      document.getElementById('apiKeyInput').value = savedKey;
+      document.getElementById('modelInput').value = savedModel;
+      document.getElementById('apiUrlInput').value = savedUrl;
+      // 加载备选平台配置
+      const backupPlatform = localStorage.getItem('llm_backup_platform') || '';
+      const backupKey = localStorage.getItem('llm_backup_key') || '';
+      document.getElementById('backupPlatformSelect').value = backupPlatform;
+      document.getElementById('backupApiKeyInput').value = backupKey;
+      onBackupPlatformChange();
+      updateAPIStatus();
+    }
+  }
+
+  function onBackupPlatformChange() {
+    const sel = document.getElementById('backupPlatformSelect');
+    const keyInput = document.getElementById('backupApiKeyInput');
+    if (sel.value) {
+      keyInput.style.display = 'block';
+      // 如果备选平台和主平台相同，提示
+      if (sel.value === selectedPlatform) {
+        keyInput.placeholder = '备选平台不应与主平台相同';
+      } else {
+        keyInput.placeholder = PLATFORMS[sel.value].name + ' API Key';
+      }
+    } else {
+      keyInput.style.display = 'none';
+    }
+  }
+
+  function selectPlatform(platform) {
+    selectedPlatform = platform;
+    // 更新选中样式
+    document.querySelectorAll('#platformOptions > div').forEach(el => {
+      if (el.dataset.platform === platform) {
+        el.style.borderColor = '#E8743C';
+        el.style.background = '#FFF8E7';
+      } else {
+        el.style.borderColor = '#ddd';
+        el.style.background = '#fff';
+      }
+    });
+
+    // 更新模型默认值
+    const config = PLATFORMS[platform];
+    if (config) {
+      // 只在输入框为空或与之前平台默认值一致时才更新
+      const modelInput = document.getElementById('modelInput');
+      const oldDefault = PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel;
+      if (!modelInput.value || modelInput.value === oldDefault) {
+        modelInput.value = config.defaultModel;
+      }
+
+      // 显示/隐藏自定义 API URL
+      const urlGroup = document.getElementById('apiUrlGroup');
+      if (platform === 'custom') {
+        urlGroup.style.display = 'block';
+        const savedUrl = localStorage.getItem('llm_api_url') || '';
+        document.getElementById('apiUrlInput').value = savedUrl;
+      } else {
+        urlGroup.style.display = 'none';
+      }
+
+      // 更新说明
+      document.getElementById('platformTip').innerHTML = config.tip;
+    }
+  }
+
+  function saveAPISettings() {
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
+    const model = document.getElementById('modelInput').value.trim();
+    const apiUrl = document.getElementById('apiUrlInput').value.trim();
+    const backupPlatform = document.getElementById('backupPlatformSelect').value;
+    const backupKey = document.getElementById('backupApiKeyInput').value.trim();
+
+    if (!apiKey) {
+      showToast('请输入 API Key');
+      return;
+    }
+    if (selectedPlatform === 'custom' && !apiUrl) {
+      showToast('请填写 API 地址');
+      return;
+    }
+    if (backupPlatform && !backupKey) {
+      showToast('请输入备选平台 API Key');
+      return;
+    }
+    if (backupPlatform && backupPlatform === selectedPlatform) {
+      showToast('备选平台不能与主平台相同');
+      return;
+    }
+
+    const config = PLATFORMS[selectedPlatform];
+    const finalModel = model || config?.defaultModel || '';
+
+    localStorage.setItem('llm_platform', selectedPlatform);
+    localStorage.setItem('llm_api_key', apiKey);
+    localStorage.setItem('llm_model', finalModel);
+    if (selectedPlatform === 'custom') {
+      localStorage.setItem('llm_api_url', apiUrl);
+    }
+    // 保存备选平台
+    if (backupPlatform && backupKey) {
+      localStorage.setItem('llm_backup_platform', backupPlatform);
+      localStorage.setItem('llm_backup_key', backupKey);
+    } else {
+      localStorage.removeItem('llm_backup_platform');
+      localStorage.removeItem('llm_backup_key');
+    }
+
+    let msg = '✅ 已配置 ' + (config?.name || '自定义');
+    if (backupPlatform) {
+      msg += ' + 备选 ' + PLATFORMS[backupPlatform].name;
+    }
+    showToast(msg);
+    updateAPIStatus();
+    setTimeout(() => toggleAPISettings(), 1500);
+  }
+
+  function clearAPISettings() {
+    localStorage.removeItem('llm_platform');
+    localStorage.removeItem('llm_api_key');
+    localStorage.removeItem('llm_model');
+    localStorage.removeItem('llm_api_url');
+    localStorage.removeItem('llm_backup_platform');
+    localStorage.removeItem('llm_backup_key');
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('modelInput').value = '';
+    document.getElementById('apiUrlInput').value = '';
+    document.getElementById('backupPlatformSelect').value = '';
+    document.getElementById('backupApiKeyInput').value = '';
+    selectPlatform('doubao');
+    onBackupPlatformChange();
+    showToast('已清除 API 配置，将使用本地模拟回复');
+    updateAPIStatus();
+  }
+
+  function updateAPIStatus() {
+    const statusEl = document.getElementById('apiStatus');
+    const apiKey = localStorage.getItem('llm_api_key');
+    if (apiKey) {
+      const platform = localStorage.getItem('llm_platform') || 'doubao';
+      const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
+      const name = PLATFORMS[platform]?.name || platform;
+      const backupPlatform = localStorage.getItem('llm_backup_platform');
+      let html = '✅ 主：<b>' + name + '</b>（' + model + '）';
+      if (backupPlatform) {
+        html += '<br>🔄 备：<b>' + PLATFORMS[backupPlatform].name + '</b>';
+      }
+      statusEl.innerHTML = html;
+      statusEl.style.color = '#4CAF50';
+    } else {
+      statusEl.textContent = '⚠️ 未配置，使用本地模拟回复';
+      statusEl.style.color = '#FF9800';
+    }
+  }
+
+  // ===== 页面初始化 =====
+  document.addEventListener('DOMContentLoaded', function() {
+    updateWelcomeCard('general');
+    updateAPIStatus();
+  });
+</script>
+</body>
+</html>
