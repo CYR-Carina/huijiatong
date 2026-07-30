@@ -1567,8 +1567,75 @@
     // 更新欢迎卡片
     updateWelcomeCard(mode);
 
+    // 切换身份清空对话历史
+    chatHistory = [];
+
     document.getElementById('identityDropdown').classList.remove('show');
     showToast('已切换到' + label + '模式');
+  }
+
+  // ===== 对话历史管理 =====
+  let chatHistory = [];
+
+  function addHistory(role, content) {
+    chatHistory.push({ role: role, content: content });
+    // 只保留最近10轮对话（20条消息），避免上下文过长
+    if (chatHistory.length > 20) {
+      chatHistory = chatHistory.slice(-20);
+    }
+  }
+
+  // ===== 简单知识库检索（关键词匹配，只取相关片段，不全塞） =====
+  function retrieveKB(query, kbText, maxChars = 3000) {
+    const keywords = [];
+    // 提取关键词
+    const keywordMap = {
+      '高三': ['普通高中', '高中', '高三', '生源地', '预申请'],
+      '高中': ['普通高中', '高中', '国家助学金', '免学杂费'],
+      '初中': ['义务教育', '初中', '寄宿生', '生活补助', '免学杂费'],
+      '小学': ['义务教育', '小学', '寄宿生', '生活补助', '免学杂费'],
+      '中职': ['中职', '中等职业', '技工学校', '免学费'],
+      '大学': ['本专科', '高校', '国家助学金', '励志奖学金', '国家奖学金', '助学贷款'],
+      '本科': ['本专科', '高校', '国家助学金', '励志奖学金', '国家奖学金', '助学贷款'],
+      '大专': ['本专科', '高职', '国家助学金', '助学贷款'],
+      '贷款': ['生源地', '助学贷款', '额度', '申请条件', '共同借款人'],
+      '助学金': ['国家助学金'],
+      '奖学金': ['国家奖学金', '励志奖学金'],
+      '诈骗': ['防诈骗', '防骗', '中奖', '手续费', '保健品', '公检法'],
+      '高血压': ['高血压', '慢病', '饮食', '用药'],
+      '糖尿病': ['糖尿病', '慢病', '饮食'],
+      '养老金': ['养老金', '城乡居民', '基础养老金'],
+      '高龄': ['高龄补贴', '高龄津贴'],
+      '医保': ['医保', '报销', '社保卡'],
+    };
+    for (const [key, words] of Object.entries(keywordMap)) {
+      if (query.includes(key)) {
+        keywords.push(...words);
+      }
+    }
+    if (keywords.length === 0) {
+      // 没匹配到关键词，返回前3000字
+      return kbText.substring(0, maxChars);
+    }
+    // 按段落分割，找包含关键词的段落
+    const paragraphs = kbText.split(/\n\n+/);
+    const scored = paragraphs.map(p => {
+      let score = 0;
+      for (const kw of keywords) {
+        if (p.includes(kw)) score += 1;
+      }
+      return { p, score };
+    }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+    let result = '';
+    for (const s of scored) {
+      if (result.length + s.p.length > maxChars) break;
+      result += s.p + '\n\n';
+    }
+    // 如果结果太短，补充开头政策概览
+    if (result.length < 500) {
+      result = kbText.substring(0, maxChars);
+    }
+    return result;
   }
 
   // ===== 发送消息 =====
@@ -1583,6 +1650,8 @@
       const reply = await getAgentReply(text, currentMode);
       removeLoading();
       addMessage(reply, 'agent');
+      addHistory('user', text);
+      addHistory('assistant', reply);
     } catch (e) {
       removeLoading();
       addMessage('抱歉，我暂时无法回答，请稍后再试。', 'agent');
@@ -1596,6 +1665,7 @@
     // 保留欢迎卡片、故事卡片、快捷操作卡片
     const toRemove = conv.querySelectorAll('.message-row');
     toRemove.forEach(el => el.remove());
+    chatHistory = [];
     showToast('对话已清空');
   }
 
@@ -1844,14 +1914,23 @@
     if (!apiUrl) throw new Error('未配置 API 地址');
     if (!model) throw new Error('未配置模型 ID');
 
+    // 知识库检索：只取和当前问题相关的片段，不全塞
+    const relevantKB = retrieveKB(text, kbContent, 3000);
+
+    // 构建消息列表：system + 历史对话 + 当前问题
+    const messages = [
+      { role: 'system', content: systemPrompt + '\n\n【相关知识库（只参考这些，不要编造）】\n' + relevantKB }
+    ];
+    // 加入历史对话（最近10轮）
+    for (const msg of chatHistory) {
+      messages.push(msg);
+    }
+
     const payload = {
       model: model,
-      messages: [
-        { role: 'system', content: systemPrompt + '\n\n【知识库】\n' + kbContent },
-        { role: 'user', content: text }
-      ],
-      temperature: 0.3,
-      max_tokens: 2048
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 4096
     };
 
     const res = await fetch(apiUrl, {
