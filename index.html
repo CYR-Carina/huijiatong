@@ -308,56 +308,49 @@
     }
     .message-row.user .msg-time { text-align: right; }
 
-    /* ===== 三下乡故事 ===== */
-    .story-card {
-      background: linear-gradient(135deg, #F8FBFF 0%, #EEF5FF 100%);
-      border-radius: 16px;
-      padding: 14px 18px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border: 1px solid #D5E3F7;
+    /* ===== 三下乡故事（嵌入欢迎卡片内） ===== */
+    .story-inline {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(220,140,50,0.25);
       cursor: pointer;
-      transition: all 0.25s;
-      box-shadow: 0 2px 8px rgba(74,144,217,0.06);
-      overflow: visible;
-      position: relative;
-      flex-shrink: 0;
+      transition: all 0.2s;
     }
-    .story-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(74,144,217,0.15);
-      border-color: #4A90D9;
+    .story-inline:hover .story-inline-title {
+      color: var(--primary);
     }
-    .story-card .story-header {
+    .story-inline-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .story-card .story-title {
-      font-size: 14px;
+    .story-inline-title {
+      font-size: 13px;
       font-weight: 700;
-      color: #2C5282;
+      color: #8B6914;
       display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
     }
-    .story-card .story-toggle {
+    .story-inline .story-toggle {
       font-size: 12px;
-      color: #4A90D9;
+      color: var(--primary);
       transition: transform 0.3s;
       font-weight: 700;
     }
-    .story-card .story-toggle.open { transform: rotate(180deg); }
-    .story-card .story-body {
+    .story-inline .story-toggle.open { transform: rotate(180deg); }
+    .story-inline-body {
       display: none;
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 13px;
-      color: #4A5A75;
+      color: #7A6040;
       line-height: 1.8;
-      border-top: 1px dashed #B5CDF0;
-      padding-top: 12px;
       word-break: break-word;
       overflow-wrap: break-word;
+      background: rgba(255,248,235,0.6);
+      border-radius: 10px;
+      padding: 12px 14px;
     }
-    .story-card .story-body.show { display: block; animation: fadeIn 0.3s; }
+    .story-inline-body.show { display: block; animation: fadeIn 0.3s; }
 
     /* ===== 新欢迎卡片 ===== */
     .welcome-card-new {
@@ -1176,21 +1169,20 @@
       <div class="suggest-questions" id="welcomeSuggestions">
         <!-- JS 动态填充 -->
       </div>
-    </div>
-
-    <!-- 三下乡故事 -->
-    <div class="story-card" id="storyCard" onclick="toggleStory()">
-      <div class="story-header">
-        <span class="story-title">★ 从三下乡中来 — 项目背景故事</span>
-        <span class="story-toggle" id="storyToggle">▾</span>
-      </div>
-      <div class="story-body" id="storyBody">
-        2026年暑期，我们参加了"铸信助学·青春护航"三下乡社会实践活动，
-        走进广东省新田镇，入户走访了困难学生家庭和留守老人。<br><br>
-        我们发现：<strong>超过70%的家庭对国家资助政策几乎不了解</strong>，
-        留守老人面对诈骗电话和健康问题不知道该问谁。<br><br>
-        于是我们做了<b>惠家通</b>——<br>
-        一个 Agent，服务整个农村家庭。
+      <!-- 三下乡故事（嵌入欢迎卡片内） -->
+      <div class="story-inline" id="storyCard" onclick="toggleStory()">
+        <div class="story-inline-header">
+          <span class="story-inline-title">★ 从三下乡中来 — 项目背景故事</span>
+          <span class="story-toggle" id="storyToggle">▾</span>
+        </div>
+        <div class="story-inline-body" id="storyBody">
+          2026年暑期，我们参加了"铸信助学·青春护航"三下乡社会实践活动，
+          走进广东省新田镇，入户走访了困难学生家庭和留守老人。<br><br>
+          我们发现：<strong>超过70%的家庭对国家资助政策几乎不了解</strong>，
+          留守老人面对诈骗电话和健康问题不知道该问谁。<br><br>
+          于是我们做了<b>惠家通</b>——<br>
+          一个 Agent，服务整个农村家庭。
+        </div>
       </div>
     </div>
   </div>
