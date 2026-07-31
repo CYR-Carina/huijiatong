@@ -1827,7 +1827,17 @@
             console.warn('备选平台API调用失败:', e2.message);
           }
         }
-        showToast('API调用失败，使用本地回复');
+        // 显示具体错误原因，方便排查
+        let errMsg = e.message || '未知错误';
+        if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+          showToast('API连接失败：可能是CORS跨域限制或网络问题，请检查API地址是否支持浏览器调用');
+        } else if (errMsg.includes('401') || errMsg.includes('403')) {
+          showToast('API认证失败：请检查API Key是否正确');
+        } else if (errMsg.includes('404')) {
+          showToast('API地址错误：请检查模型ID是否正确');
+        } else {
+          showToast('API调用失败: ' + errMsg.substring(0, 80));
+        }
       }
     }
 
