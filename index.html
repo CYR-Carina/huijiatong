@@ -1292,7 +1292,7 @@
     <!-- 平台选择 -->
     <label style="font-size:14px;color:#333;font-weight:600;display:block;margin-bottom:6px;">选择平台</label>
     <div id="platformOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
-      <div onclick="selectPlatform('doubao')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;display:flex;flex-direction:column;align-items:center;">
+      <div onclick="selectPlatform('zhipu')" data-platform="doubao" style="flex:1;min-width:100px;padding:10px 12px;border:2px solid #E8743C;border-radius:10px;cursor:pointer;text-align:center;background:#FFF8E7;display:flex;flex-direction:column;align-items:center;">
         <div style="font-size:24px;line-height:1.2;margin-bottom:2px;">🔥</div>
         <div style="font-size:13px;font-weight:600;color:#333;">豆包</div>
         <div style="font-size:11px;color:#888;">50万+200万/天</div>
@@ -1714,23 +1714,23 @@
 
   // ===== 多平台 API 配置 =====
   const PLATFORMS = {
-    doubao: {
-      name: '豆包（火山引擎）',
-      apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
-      defaultModel: 'doubao-3-5-32k-250428',
-      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• 加入协作奖励计划每天200万Token<br>• 获取：火山引擎控制台 → 方舟 → API Key<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
-    },
     zhipu: {
       name: '智谱AI（GLM）',
       apiUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
       defaultModel: 'glm-4-flash',
-      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
+      tip: '🧠 <b>智谱AI GLM-4-Flash</b><br>• <b>完全免费，不限量！</b><br>• 注册再送2000万Token<br>• 支持浏览器CORS跨域调用<br>• 中文理解优秀，适合本场景<br>• <a href="https://bigmodel.cn" target="_blank">点击前往注册</a>'
     },
     siliconflow: {
       name: '硅基流动',
       apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
       defaultModel: 'deepseek-ai/DeepSeek-V3',
       tip: '⚡ <b>硅基流动 SiliconFlow</b><br>• 注册送2000万Token（永久有效）<br>• 30+模型聚合，一个Key调用全部<br>• 国内服务器，响应速度快<br>• <a href="https://cloud.siliconflow.cn" target="_blank">点击前往注册</a>'
+    },
+    doubao: {
+      name: '豆包（火山引擎）',
+      apiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+      defaultModel: '',
+      tip: '🔥 <b>豆包大模型</b><br>• 新用户每模型50万Token免费<br>• ⚠️ 注意：需要在方舟控制台创建"推理接入点"，模型ID填写接入点ID（ep-xxx），不是模型名<br>• <a href="https://console.volcengine.com/ark" target="_blank">点击前往控制台</a>'
     },
     custom: {
       name: '自定义平台',
@@ -1741,15 +1741,15 @@
   };
 
   function getApiUrl() {
-    const platform = localStorage.getItem('llm_platform') || 'doubao';
+    const platform = localStorage.getItem('llm_platform') || 'zhipu';
     if (platform === 'custom') {
       return localStorage.getItem('llm_api_url') || '';
     }
-    return PLATFORMS[platform]?.apiUrl || PLATFORMS.doubao.apiUrl;
+    return PLATFORMS[platform]?.apiUrl || PLATFORMS.zhipu.apiUrl;
   }
 
   function getModel() {
-    return localStorage.getItem('llm_model') || PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel || 'doubao-3-5-32k-250428';
+    return localStorage.getItem('llm_model') || PLATFORMS[localStorage.getItem('llm_platform') || 'zhipu']?.defaultModel || 'glm-4-flash';
   }
 
   // ===== 知识库内容（嵌入前端，作为 system prompt 上下文） =====
@@ -1817,7 +1817,7 @@
   async function getAgentReply(text, mode) {
     // 1. 优先尝试主平台 API
     const apiKey = localStorage.getItem('llm_api_key');
-    const platform = localStorage.getItem('llm_platform') || 'doubao';
+    const platform = localStorage.getItem('llm_platform') || 'zhipu';
     if (apiKey) {
       try {
         const reply = await callLLMAPI(text, mode, apiKey, platform);
@@ -1856,7 +1856,7 @@
 
   // ===== 通用大模型 API 调用（支持多平台） =====
   async function callLLMAPI(text, mode, apiKey, platform) {
-    platform = platform || localStorage.getItem('llm_platform') || 'doubao';
+    platform = platform || localStorage.getItem('llm_platform') || 'zhipu';
     // 根据模式选择知识库和 system prompt
     let systemPrompt = '';
     let kbContent = '';
@@ -1939,7 +1939,7 @@
     } else {
       apiUrl = config.apiUrl;
       // 主平台用 llm_model，备选用默认模型
-      model = (platform === (localStorage.getItem('llm_platform') || 'doubao'))
+      model = (platform === (localStorage.getItem('llm_platform') || 'zhipu'))
         ? (localStorage.getItem('llm_model') || config.defaultModel)
         : config.defaultModel;
     }
@@ -1950,14 +1950,18 @@
     // 知识库检索：只取和当前问题相关的片段，不全塞
     const relevantKB = retrieveKB(text, kbContent, 3000);
 
-    // 构建消息列表：system + 历史对话 + 当前问题
+    // 构建消息列表：system + 历史对话 + 当前用户问题
     const messages = [
       { role: 'system', content: systemPrompt + '\n\n【相关知识库（只参考这些，不要编造）】\n' + relevantKB }
     ];
-    // 加入历史对话（最近10轮）
+    // 加入历史对话（最近10轮），过滤掉空内容消息
     for (const msg of chatHistory) {
-      messages.push(msg);
+      if (msg.content && msg.content.trim().length > 0) {
+        messages.push({ role: msg.role, content: msg.content });
+      }
     }
+    // 当前问题必须作为最后一条user消息
+    messages.push({ role: 'user', content: text });
 
     const payload = {
       model: model,
@@ -2553,14 +2557,14 @@
   }
 
   // ===== API 设置 =====
-  let selectedPlatform = 'doubao';
+  let selectedPlatform = 'zhipu';
 
   function toggleAPISettings() {
     const modal = document.getElementById('apiModal');
     const isHidden = modal.style.display === 'none';
     modal.style.display = isHidden ? 'flex' : 'none';
     if (isHidden) {
-      selectedPlatform = localStorage.getItem('llm_platform') || 'doubao';
+      selectedPlatform = localStorage.getItem('llm_platform') || 'zhipu';
       selectPlatform(selectedPlatform);
       const savedKey = localStorage.getItem('llm_api_key') || '';
       const savedModel = localStorage.getItem('llm_model') || '';
@@ -2612,7 +2616,7 @@
     if (config) {
       // 只在输入框为空或与之前平台默认值一致时才更新
       const modelInput = document.getElementById('modelInput');
-      const oldDefault = PLATFORMS[localStorage.getItem('llm_platform') || 'doubao']?.defaultModel;
+      const oldDefault = PLATFORMS[localStorage.getItem('llm_platform') || 'zhipu']?.defaultModel;
       if (!modelInput.value || modelInput.value === oldDefault) {
         modelInput.value = config.defaultModel;
       }
@@ -2695,7 +2699,7 @@
     document.getElementById('apiUrlInput').value = '';
     document.getElementById('backupPlatformSelect').value = '';
     document.getElementById('backupApiKeyInput').value = '';
-    selectPlatform('doubao');
+    selectPlatform('zhipu');
     onBackupPlatformChange();
     showToast('已清除 API 配置，将使用本地模拟回复');
     updateAPIStatus();
@@ -2705,7 +2709,7 @@
     const statusEl = document.getElementById('apiStatus');
     const apiKey = localStorage.getItem('llm_api_key');
     if (apiKey) {
-      const platform = localStorage.getItem('llm_platform') || 'doubao';
+      const platform = localStorage.getItem('llm_platform') || 'zhipu';
       const model = localStorage.getItem('llm_model') || PLATFORMS[platform]?.defaultModel || '';
       const name = PLATFORMS[platform]?.name || platform;
       const backupPlatform = localStorage.getItem('llm_backup_platform');
