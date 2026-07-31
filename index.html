@@ -2292,20 +2292,93 @@
       return;
     }
 
-    const utter = new SpeechSynthesisUtterance(cleanText);
-    utter.lang = 'zh-CN';
-    utter.rate = speechRate || 0.9;
-    utter.volume = 1;
-    utter.pitch = 1;
+    // 将文本按标点分段，每段单独播放，句间自然停顿
+    // 这样语音更自然，有人情味，不会一口气读完
+    const segments = cleanText.split(/([。！？\n])/).filter(s => s.trim());
+    // 把标点加回段落末尾
+    const chunks = [];
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i].trim();
+      if (!seg) continue;
+      if (/[。！？\n]/.test(seg) && chunks.length > 0) {
+        chunks[chunks.length - 1] += seg;
+      } else {
+        // 长段再按逗号分
+        if (seg.length > 40) {
+          const parts = seg.split(/([，,；])/).filter(s => s.trim());
+          let buf = '';
+          for (const p of parts) {
+            if (/[，,；]/.test(p)) buf += p;
+            else {
+              buf += p;
+              if (buf.length > 30) {
+                chunks.push(buf);
+                buf = '';
+              }
+            }
+          }
+          if (buf) chunks.push(buf);
+        } else {
+          chunks.push(seg);
+        }
+      }
+    }
+    if (chunks.length === 0) chunks.push(cleanText);
 
     // 优先选择中文女声
     const voices = window.speechSynthesis.getVoices() || [];
     const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting|yaoyao|kangkang/i.test(v.name))
                  || voices.find(v => v.lang === 'zh-CN')
                  || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
-    if (zhVoice) utter.voice = zhVoice;
 
-    currentUtter = utter;
+    let chunkIndex = 0;
+    function speakNext() {
+      if (chunkIndex >= chunks.length) {
+        // 全部播放完毕
+        isSpeaking = false;
+        isPaused = false;
+        stopKeepAlive();
+        currentUtter = null;
+        const sb = document.getElementById('stopBtn');
+        if (sb) sb.style.display = 'none';
+        return;
+      }
+      const chunk = chunks[chunkIndex];
+      const utter = new SpeechSynthesisUtterance(chunk);
+      utter.lang = 'zh-CN';
+      utter.rate = speechRate || 0.9;
+      utter.volume = 1;
+      utter.pitch = 1.1; // 略高音调，更亲切
+      if (zhVoice) utter.voice = zhVoice;
+
+      currentUtter = utter;
+      utter.onend = function() {
+        chunkIndex++;
+        // 句间自然停顿300ms
+        setTimeout(speakNext, 300);
+      };
+      utter.onerror = function(e) {
+        console.warn('语音播放错误:', e);
+        isSpeaking = false;
+        isPaused = false;
+        stopKeepAlive();
+        const sb = document.getElementById('stopBtn');
+        if (sb) sb.style.display = 'none';
+        if (e && e.error === 'not-allowed') {
+          showToast('请点击页面任意位置后重试（浏览器需要授权语音）');
+        }
+      };
+
+      try {
+        window.speechSynthesis.speak(utter);
+      } catch(err) {
+        console.error('speak 调用异常:', err);
+        isSpeaking = false;
+        const sb = document.getElementById('stopBtn');
+        if (sb) sb.style.display = 'none';
+      }
+    }
+
     isSpeaking = true;
     isPaused = false;
     const stopBtn = document.getElementById('stopBtn');
@@ -2314,32 +2387,10 @@
       updateStopBtnUI('playing');
     }
 
-    utter.onend = function() {
-      isSpeaking = false;
-      isPaused = false;
-      stopKeepAlive();
-      const sb = document.getElementById('stopBtn');
-      if (sb) sb.style.display = 'none';
-    };
-    utter.onerror = function(e) {
-      console.warn('语音播放错误:', e);
-      isSpeaking = false;
-      isPaused = false;
-      stopKeepAlive();
-      const sb = document.getElementById('stopBtn');
-      if (sb) sb.style.display = 'none';
-      // 错误时给用户清晰提示
-      if (e && e.error === 'not-allowed') {
-        showToast('请点击页面任意位置后重试（浏览器需要授权语音）');
-      } else {
-        showToast('语音播放失败，请检查浏览器设置');
-      }
-    };
-
     // 真正发起播放（保持异步，兼容 iOS Safari）
     setTimeout(function() {
       try {
-        window.speechSynthesis.speak(utter);
+        speakNext();
         startKeepAlive();
       } catch(err) {
         console.error('speak 调用异常:', err);
@@ -2438,6 +2489,43 @@
     speechRate = rate;
     document.querySelectorAll('.speed-option').forEach(o => o.classList.remove('active'));
     el.classList.add('active');
+    // 如果正在播放，立即用新语速重新播放
+    if (isSpeaking && currentUtter) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+      // 重新播放当前内容
+      setTimeout(function() {
+        const oldText = currentUtter.text;
+        currentUtter = null;
+        isSpeaking = false;
+        // 重新创建播放
+        const utter = new SpeechSynthesisUtterance(oldText);
+        utter.lang = 'zh-CN';
+        utter.rate = speechRate;
+        utter.volume = 1;
+        utter.pitch = 1.1;
+        const voices = window.speechSynthesis.getVoices() || [];
+        const zhVoice = voices.find(v => v.lang === 'zh-CN' && /female|女|xiao|ting|yaoyao|kangkang/i.test(v.name))
+                     || voices.find(v => v.lang === 'zh-CN')
+                     || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
+        if (zhVoice) utter.voice = zhVoice;
+        currentUtter = utter;
+        isSpeaking = true;
+        utter.onend = function() {
+          isSpeaking = false;
+          stopKeepAlive();
+          const sb = document.getElementById('stopBtn');
+          if (sb) sb.style.display = 'none';
+        };
+        utter.onerror = function() {
+          isSpeaking = false;
+          stopKeepAlive();
+          const sb = document.getElementById('stopBtn');
+          if (sb) sb.style.display = 'none';
+        };
+        window.speechSynthesis.speak(utter);
+        startKeepAlive();
+      }, 100);
+    }
   }
 
   // ===== 语音识别 =====
