@@ -1201,8 +1201,9 @@
       <div class="speed-switch" id="speedSwitch">
         <span class="speed-label">语速</span>
         <div class="speed-options">
-          <div class="speed-option" onclick="setSpeed(1.0,this)">正常</div>
-          <div class="speed-option active" onclick="setSpeed(0.8,this)">慢速</div>
+          <div class="speed-option" onclick="setSpeed(1.2,this)">快速</div>
+          <div class="speed-option active" onclick="setSpeed(0.9,this)">正常</div>
+          <div class="speed-option" onclick="setSpeed(0.6,this)">慢速</div>
         </div>
       </div>
     </div>
@@ -1364,7 +1365,7 @@
 <script>
   // ===== 状态 =====
   let currentMode = 'general';
-  let speechRate = 0.8;
+  let speechRate = 0.9;
   let isRecording = false;
   let recognition = null;
 
