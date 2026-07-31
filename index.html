@@ -1143,11 +1143,8 @@
           <div class="wc-subtitle" id="wcSubtitle">乡村家庭智能服务助手</div>
         </div>
       </div>
-      <div class="wc-desc" id="wcDesc">
-        一个 Agent，服务全家——选个身份开始吧，或直接点击您想问的问题：
-      </div>
-      <!-- 三下乡故事（嵌入欢迎卡片内，放在介绍之后、功能入口之前） -->
-      <div class="story-inline" id="storyCard" onclick="toggleStory()">
+      <!-- 三下乡故事（放在问候语之后、介绍文字之前，拉开间距） -->
+      <div class="story-inline" id="storyCard" onclick="toggleStory()" style="margin: 16px 0;">
         <div class="story-inline-header">
           <span class="story-inline-title">★ 从三下乡中来 — 项目背景故事</span>
           <span class="story-toggle" id="storyToggle">▾</span>
@@ -1161,8 +1158,11 @@
           一个 Agent，服务整个农村家庭。
         </div>
       </div>
+      <div class="wc-desc" id="wcDesc" style="margin-top: 4px;">
+        一个 Agent，服务全家——选个身份开始吧，或直接点击您想问的问题：
+      </div>
       <!-- 功能小卡片 -->
-      <div class="wc-features" id="wcFeatures">
+      <div class="wc-features" id="wcFeatures" style="margin-top: 12px;">
         <div class="wc-feat-item">
           <span class="wc-feat-icon">📚</span>
           <span class="wc-feat-text"><b>学生</b> 资助政策</span>
