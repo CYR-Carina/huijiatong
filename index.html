@@ -1683,9 +1683,18 @@
     try {
       const reply = await getAgentReply(text, currentMode);
       removeLoading();
-      addMessage(reply, 'agent');
-      addHistory('user', text);
-      addHistory('assistant', reply);
+      // 检查API返回是否为空或无效内容，空的话回退到模拟回复
+      if (!reply || reply.trim().length < 2 || reply.trim() === '。') {
+        console.warn('API返回内容为空，使用本地模拟回复');
+        const fallback = simulateReply(text, currentMode);
+        addMessage(fallback, 'agent');
+        addHistory('user', text);
+        addHistory('assistant', fallback);
+      } else {
+        addMessage(reply, 'agent');
+        addHistory('user', text);
+        addHistory('assistant', reply);
+      }
     } catch (e) {
       removeLoading();
       addMessage('抱歉，我暂时无法回答，请稍后再试。', 'agent');
@@ -1979,7 +1988,11 @@
     }
 
     const data = await res.json();
-    return data.choices[0].message.content;
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content || content.trim().length < 1) {
+      throw new Error('API返回内容为空');
+    }
+    return content;
   }
 
   // ===== 模拟回复（API 不可用时备用） =====
@@ -2532,11 +2545,11 @@
   }
 
   // ===== Toast =====
-  function showToast(msg) {
+  function showToast(msg, duration = 4000) {
     const el = document.getElementById('toast');
     el.textContent = msg;
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2500);
+    setTimeout(() => el.classList.remove('show'), duration);
   }
 
   // ===== API 设置 =====
